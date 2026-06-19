@@ -1,0 +1,42 @@
+import 'package:get_it/get_it.dart';
+
+import '../../../core/network/api_client.dart';
+import '../../../core/network/network_info.dart';
+import '../../home/presentation/cubit/home_cubit.dart';
+import '../../journal/presentation/cubit/journal_cubit.dart';
+import '../../shared/presentation/cubit/selected_topic_cubit.dart';
+import '../data/datasources/publication_remote_datasource.dart';
+import '../data/repositories/publication_repository_impl.dart';
+import '../domain/repositories/publication_repository.dart';
+import '../domain/usecases/get_topic_trend.dart';
+import '../domain/usecases/get_works_by_topic.dart';
+import '../domain/usecases/search_topics.dart';
+
+void initPublicationFeature(GetIt sl) {
+  // Datasource
+  sl.registerLazySingleton<PublicationRemoteDatasource>(
+    () => PublicationRemoteDatasourceImpl(sl<ApiClient>()),
+  );
+
+  // Repository
+  sl.registerLazySingleton<PublicationRepository>(
+    () => PublicationRepositoryImpl(
+      datasource: sl<PublicationRemoteDatasource>(),
+      networkInfo: sl<NetworkInfo>(),
+    ),
+  );
+
+  // Use cases
+  sl.registerLazySingleton(() => SearchTopics(sl<PublicationRepository>()));
+  sl.registerLazySingleton(() => GetWorksByTopic(sl<PublicationRepository>()));
+  sl.registerLazySingleton(() => GetTopicTrend(sl<PublicationRepository>()));
+
+  // Shared state (singleton — cùng instance cho mọi tab)
+  sl.registerSingleton<SelectedTopicCubit>(SelectedTopicCubit());
+
+  // Cubits (factory = fresh state mỗi lần tạo tab)
+  sl.registerFactory(() => HomeCubit(sl<SearchTopics>()));
+  sl.registerFactory(
+    () => JournalCubit(sl<GetWorksByTopic>(), sl<GetTopicTrend>()),
+  );
+}

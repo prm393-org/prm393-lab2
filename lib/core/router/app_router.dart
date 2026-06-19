@@ -1,63 +1,65 @@
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../constants/app_constants.dart';
+import '../../features/home/presentation/pages/home_page.dart';
+import '../../features/journal/presentation/pages/journal_page.dart';
+import '../../features/journal/presentation/pages/publication_detail_page.dart';
+import '../../features/keywords/presentation/pages/keywords_page.dart';
+import '../../features/profile/presentation/pages/profile_page.dart';
+import '../../features/publication/domain/entities/work.dart';
+import '../navigation/main_scaffold.dart';
 
-/// Cấu hình điều hướng toàn app (go_router).
-///
-/// Khi triển khai UI, thay route placeholder bên dưới bằng `StatefulShellRoute`
-/// chứa 4 tab: Home | Journal | Keywords | Profile, và route push cho
-/// `PublicationDetailPage`.
 class AppRouter {
   AppRouter._();
 
   static final GoRouter router = GoRouter(
-    initialLocation: '/',
+    initialLocation: '/home',
     routes: [
-      GoRoute(
-        path: '/',
-        builder: (context, state) => const _SetupPlaceholderPage(),
-      ),
-
-      // TODO(team): thay bằng shell 4 tab khi làm UI, ví dụ:
-      // StatefulShellRoute.indexedStack(
-      //   builder: (context, state, navigationShell) =>
-      //       MainScaffold(navigationShell: navigationShell),
-      //   branches: [
-      //     StatefulShellBranch(routes: [GoRoute(path: '/home', ...)]),
-      //     StatefulShellBranch(routes: [GoRoute(path: '/journal', ...)]),
-      //     StatefulShellBranch(routes: [GoRoute(path: '/keywords', ...)]),
-      //     StatefulShellBranch(routes: [GoRoute(path: '/profile', ...)]),
-      //   ],
-      // ),
-    ],
-  );
-}
-
-/// Trang tạm thời xác nhận project đã setup xong. Xoá khi bắt đầu làm UI.
-class _SetupPlaceholderPage extends StatelessWidget {
-  const _SetupPlaceholderPage();
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text(AppConstants.appName)),
-      body: const Center(
-        child: Padding(
-          padding: EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.check_circle_outline, size: 64),
-              SizedBox(height: 16),
-              Text(
-                'Project skeleton đã sẵn sàng.\nBắt đầu triển khai Home | Journal | Keywords | Profile.',
-                textAlign: TextAlign.center,
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) =>
+            MainScaffold(navigationShell: navigationShell),
+        branches: [
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/home',
+                builder: (context, state) => const HomePage(),
               ),
             ],
           ),
-        ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/journal',
+                builder: (context, state) => const JournalPage(),
+                routes: [
+                  GoRoute(
+                    path: 'detail',
+                    builder: (context, state) => PublicationDetailPage(
+                      work: state.extra as Work,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/keywords',
+                builder: (context, state) => const KeywordsPage(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/profile',
+                builder: (context, state) => const ProfilePage(),
+              ),
+            ],
+          ),
+        ],
       ),
-    );
-  }
+    ],
+  );
 }

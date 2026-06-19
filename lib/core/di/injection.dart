@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../config/app_config.dart';
 import '../network/api_client.dart';
 import '../network/network_info.dart';
+import '../../features/publication/di/publication_di.dart';
 
 /// Service locator toàn cục.
 final GetIt getIt = GetIt.instance;
@@ -34,9 +35,6 @@ Future<void> configureDependencies() async {
     return client;
   });
 
-  // Features — đăng ký tại đây khi triển khai:
-  // _initHome(getIt);
-  // _initJournal(getIt);
-  // _initKeywords(getIt);
-  // _initProfile(getIt);
+  // Features
+  initPublicationFeature(getIt);
 }
