@@ -64,6 +64,10 @@ class _JournalView extends StatelessWidget {
     return SliverAppBar(
       expandedHeight: topic != null ? 130 : 90,
       pinned: true,
+      backgroundColor: const Color(0xFF1D4ED8),
+      surfaceTintColor: Colors.transparent,
+      scrolledUnderElevation: 0,
+      elevation: 0,
       actions: [
         if (state is JournalLoaded)
           IconButton(

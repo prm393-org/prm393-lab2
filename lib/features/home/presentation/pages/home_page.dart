@@ -68,6 +68,10 @@ class _HomeView extends StatelessWidget {
     return SliverAppBar(
       expandedHeight: 120,
       pinned: true,
+      backgroundColor: const Color(0xFF1D4ED8), // xanh dương đậm
+      surfaceTintColor: Colors.transparent,
+      scrolledUnderElevation: 0,
+      elevation: 0,
       flexibleSpace: FlexibleSpaceBar(
         titlePadding: const EdgeInsets.only(left: 16, bottom: 14),
         title: const Column(
