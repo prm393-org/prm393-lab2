@@ -98,13 +98,13 @@ class TrendChart extends StatelessWidget {
               style: tt.bodySmall
                   ?.copyWith(color: cs.onSurface.withValues(alpha: 0.5)),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
             SizedBox(
-              height: 160,
+              height: 200,
               child: BarChart(
                 BarChartData(
                   alignment: BarChartAlignment.spaceBetween,
-                  maxY: maxCount * 1.15,
+                  maxY: maxCount * 1.25,
                   barTouchData: BarTouchData(
                     touchTooltipData: BarTouchTooltipData(
                       getTooltipColor: (_) => cs.inverseSurface,
@@ -145,14 +145,18 @@ class TrendChart extends StatelessWidget {
                     bottomTitles: AxisTitles(
                       sideTitles: SideTitles(
                         showTitles: true,
-                        reservedSize: 24,
+                        reservedSize: 30,
                         getTitlesWidget: (value, meta) {
                           final i = value.toInt();
                           if (i < 0 || i >= points.length) {
                             return const SizedBox.shrink();
                           }
+                          final last = points.length - 1;
                           final step = points.length > 8 ? 2 : 1;
-                          if (i % step != 0 && i != points.length - 1) {
+                          // Luôn hiện nhãn cuối; các nhãn khác theo bước, nhưng
+                          // bỏ nhãn sát ngay trước nhãn cuối để chữ khỏi chen nhau.
+                          final showByStep = i % step == 0 && i != last - 1;
+                          if (i != last && !showByStep) {
                             return const SizedBox.shrink();
                           }
                           return Padding(

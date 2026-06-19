@@ -15,23 +15,36 @@ class PublicationDetailPage extends StatelessWidget {
     final tt = Theme.of(context).textTheme;
 
     return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: const Text(
+          'Publication Details',
+          style: TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        surfaceTintColor: Colors.transparent,
+      ),
       body: CustomScrollView(
         slivers: [
-          SliverAppBar.large(
-            title: const Text('Publication Details'),
-            backgroundColor: cs.surface,
-            foregroundColor: cs.onSurface,
-          ),
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 0, 20, 32),
+              padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SelectableText(
                     work.title,
-                    style: tt.headlineSmall
-                        ?.copyWith(fontWeight: FontWeight.bold, height: 1.3),
+                    style: tt.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      height: 1.3,
+                      color: Colors.black,
+                    ),
                   ),
                   const SizedBox(height: 16),
                   if (work.authors.isNotEmpty) ...[
@@ -46,8 +59,9 @@ class PublicationDetailPage extends StatelessWidget {
                               padding: EdgeInsets.zero,
                               materialTapTargetSize:
                                   MaterialTapTargetSize.shrinkWrap,
-                              backgroundColor: cs.secondaryContainer
-                                  .withValues(alpha: 0.5),
+                              backgroundColor: cs.secondaryContainer.withValues(
+                                alpha: 0.5,
+                              ),
                             ),
                           )
                           .toList(),
@@ -63,7 +77,10 @@ class PublicationDetailPage extends StatelessWidget {
                   if (work.abstract_ != null && work.abstract_!.isNotEmpty)
                     SelectableText(
                       work.abstract_!,
-                      style: tt.bodyMedium?.copyWith(height: 1.6),
+                      style: tt.bodyMedium?.copyWith(
+                        height: 1.6,
+                        color: Colors.black87,
+                      ),
                     )
                   else
                     Text(
@@ -186,8 +203,11 @@ class _CitationSection extends StatelessWidget {
   final int count;
   final ColorScheme cs;
   final TextTheme tt;
-  const _CitationSection(
-      {required this.count, required this.cs, required this.tt});
+  const _CitationSection({
+    required this.count,
+    required this.cs,
+    required this.tt,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -219,8 +239,9 @@ class _CitationSection extends StatelessWidget {
                 ),
                 Text(
                   'times cited',
-                  style: tt.bodySmall
-                      ?.copyWith(color: cs.onSurface.withValues(alpha: 0.5)),
+                  style: tt.bodySmall?.copyWith(
+                    color: cs.onSurface.withValues(alpha: 0.5),
+                  ),
                 ),
               ],
             ),

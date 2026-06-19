@@ -62,16 +62,16 @@ class JournalLoaded extends JournalState {
     this.sort = WorkSortOption.citations,
   });
 
-  /// Dải năm cho menu lọc (giảm dần, mới nhất trước).
+  /// Các năm cho menu lọc, sắp giảm dần (mới nhất trước).
   ///
-  /// Lấy năm nhỏ nhất / lớn nhất từ dữ liệu trend rồi sinh dải liên tục, để
-  /// menu không bị thiếu năm khi trend thưa (chỉ có vài điểm dữ liệu).
+  /// Ưu tiên các năm có dữ liệu trend; nếu trend rỗng/lỗi thì dùng dải ~16 năm
+  /// gần nhất để bộ lọc vẫn bấm được (không bị vô hiệu hoá).
   List<int> get availableYears {
-    if (trend.isEmpty) return const [];
-    final years = trend.map((t) => t.year);
-    final maxYear = years.reduce((a, b) => a > b ? a : b);
-    final minYear = years.reduce((a, b) => a < b ? a : b);
-    return [for (var y = maxYear; y >= minYear; y--) y];
+    if (trend.isNotEmpty) {
+      return trend.map((t) => t.year).toList()..sort((a, b) => b.compareTo(a));
+    }
+    final now = DateTime.now().year;
+    return [for (var y = now; y >= now - 15; y--) y];
   }
 
   JournalLoaded copyWith({

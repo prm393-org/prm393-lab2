@@ -79,7 +79,9 @@ class PublicationRemoteDatasourceImpl implements PublicationRemoteDatasource {
       final response = await _apiClient.dio.get('/works', queryParameters: {
         'filter': 'primary_topic.id:${_shortId(topicId)}',
         'group_by': 'publication_year',
-        'per_page': 1,
+        // per_page giới hạn SỐ NHÓM trả về — phải đủ lớn để lấy hết các năm
+        // (mặc định/giá trị nhỏ chỉ trả về 1 nhóm). 200 là mức tối đa OpenAlex.
+        'per_page': 200,
       });
       final data = response.data as Map<String, dynamic>?;
       final groups = data?['group_by'] as List<dynamic>? ?? [];
