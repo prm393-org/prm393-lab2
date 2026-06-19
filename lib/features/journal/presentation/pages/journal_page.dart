@@ -47,10 +47,7 @@ class _JournalView extends StatelessWidget {
     return BlocBuilder<JournalCubit, JournalState>(
       builder: (context, state) {
         return CustomScrollView(
-          slivers: [
-            _buildAppBar(context, state),
-            _buildBody(context, state),
-          ],
+          slivers: [_buildAppBar(context, state), _buildBody(context, state)],
         );
       },
     );
@@ -97,7 +94,9 @@ class _JournalView extends StatelessWidget {
                     Text(
                       topic.fieldName!,
                       style: const TextStyle(
-                          color: Colors.white70, fontSize: 11),
+                        color: Colors.white70,
+                        fontSize: 11,
+                      ),
                     ),
                 ],
               )
@@ -116,11 +115,6 @@ class _JournalView extends StatelessWidget {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
-          ),
-          child: const Align(
-            alignment: Alignment(0.78, -0.2),
-            child:
-                Icon(Icons.article_outlined, size: 70, color: Colors.white12),
           ),
         ),
       ),
@@ -143,27 +137,28 @@ class _JournalView extends StatelessWidget {
                     color: const Color(0xFF7C3AED).withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.touch_app_outlined,
-                      size: 48, color: Color(0xFF7C3AED)),
+                  child: const Icon(
+                    Icons.touch_app_outlined,
+                    size: 48,
+                    color: Color(0xFF7C3AED),
+                  ),
                 ),
                 const SizedBox(height: 20),
                 Text(
                   'Chưa chọn chủ đề',
-                  style: Theme.of(context)
-                      .textTheme
-                      .titleMedium
-                      ?.copyWith(fontWeight: FontWeight.bold),
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   'Về tab Home, chọn một chủ đề\nđể xem danh sách bài báo.',
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .onSurface
-                            .withValues(alpha: 0.5),
-                      ),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.5),
+                  ),
                 ),
                 const SizedBox(height: 20),
                 FilledButton.icon(
@@ -219,19 +214,18 @@ class _JournalView extends StatelessWidget {
                   Text(
                     '${state.works.length} / ${state.total} bài báo',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onSurface
-                              .withValues(alpha: 0.5),
-                        ),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withValues(alpha: 0.5),
+                    ),
                   ),
                   const Spacer(),
                   Text(
                     'Sắp xếp: ${state.sort.label}',
                     style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: Theme.of(context).colorScheme.primary,
-                          fontWeight: FontWeight.w500,
-                        ),
+                      color: Theme.of(context).colorScheme.primary,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ],
               ),
@@ -255,7 +249,8 @@ class _JournalView extends StatelessWidget {
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: 48),
                 child: Center(
-                    child: Text('Không có bài báo nào phù hợp bộ lọc.')),
+                  child: Text('Không có bài báo nào phù hợp bộ lọc.'),
+                ),
               ),
             ),
           SliverList.builder(
@@ -301,8 +296,10 @@ class _JournalView extends StatelessWidget {
               child: Padding(
                 padding: EdgeInsets.fromLTRB(16, 16, 16, 28),
                 child: Center(
-                  child: Text('— Đã hết bài báo —',
-                      style: TextStyle(fontSize: 12, color: Colors.grey)),
+                  child: Text(
+                    '— Đã hết bài báo —',
+                    style: TextStyle(fontSize: 12, color: Colors.grey),
+                  ),
                 ),
               ),
             ),

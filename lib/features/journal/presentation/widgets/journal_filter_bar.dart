@@ -26,7 +26,7 @@ class JournalFilterBar extends StatelessWidget {
     final primary = theme.colorScheme.primary;
 
     return SizedBox(
-      height: 44,
+      height: 52,
       child: ListView(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.fromLTRB(16, 6, 16, 6),
@@ -60,6 +60,8 @@ class JournalFilterBar extends StatelessWidget {
           // Menu sắp xếp.
           PopupMenuButton<WorkSortOption>(
             tooltip: 'Sắp xếp',
+            splashRadius: 0,
+            position: PopupMenuPosition.under,
             onSelected: onSortChanged,
             itemBuilder: (_) => [
               for (final option in WorkSortOption.all)
@@ -84,9 +86,13 @@ class JournalFilterBar extends StatelessWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text('Sắp xếp: ${sort.label}',
-                      style: const TextStyle(
-                          fontSize: 13, fontWeight: FontWeight.w500)),
+                  Text(
+                    'Sắp xếp: ${sort.label}',
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
                   const SizedBox(width: 4),
                   const Icon(Icons.arrow_drop_down, size: 20),
                 ],
@@ -110,46 +116,130 @@ class _FilterButton extends StatelessWidget {
     required this.onYearChanged,
   });
 
+  Future<void> _openPicker(BuildContext context) async {
+    // Trả về: -1 = "Tất cả các năm", >0 = năm cụ thể, null = đóng/không chọn.
+    final result = await showModalBottomSheet<int>(
+      context: context,
+      showDragHandle: true,
+      isScrollControlled: true,
+      builder: (_) => _YearPickerSheet(years: years, selectedYear: selectedYear),
+    );
+    if (result == null) return; // người dùng đóng sheet, giữ nguyên
+    onYearChanged(result == -1 ? null : result);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return PopupMenuButton<int?>(
-      tooltip: 'Lọc theo năm',
-      enabled: years.isNotEmpty,
-      onSelected: onYearChanged,
-      itemBuilder: (_) => [
-        const PopupMenuItem<int?>(value: null, child: Text('Tất cả các năm')),
-        const PopupMenuDivider(),
-        for (final year in years)
-          PopupMenuItem<int?>(
-            value: year,
-            child: Row(
-              children: [
-                Icon(
-                  year == selectedYear
-                      ? Icons.check_circle
-                      : Icons.circle_outlined,
-                  size: 18,
-                  color: year == selectedYear
-                      ? Theme.of(context).colorScheme.primary
-                      : Colors.grey,
-                ),
-                const SizedBox(width: 10),
-                Text('$year'),
-              ],
-            ),
-          ),
-      ],
+    return InkWell(
+      borderRadius: BorderRadius.circular(20),
+      onTap: () => _openPicker(context),
       child: _Pill(
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: const [
             Icon(Icons.tune, size: 16),
             SizedBox(width: 6),
-            Text('Bộ lọc',
-                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
+            Text(
+              'Bộ lọc',
+              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+            ),
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Bottom sheet chọn năm — cuộn mượt kể cả khi có rất nhiều năm.
+class _YearPickerSheet extends StatelessWidget {
+  final List<int> years;
+  final int? selectedYear;
+
+  const _YearPickerSheet({required this.years, required this.selectedYear});
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final tt = Theme.of(context).textTheme;
+    final maxHeight = MediaQuery.of(context).size.height * 0.6;
+
+    return SafeArea(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxHeight: maxHeight),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
+              child: Row(
+                children: [
+                  Icon(Icons.tune, size: 18, color: cs.primary),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Lọc theo năm xuất bản',
+                    style:
+                        tt.titleSmall?.copyWith(fontWeight: FontWeight.w600),
+                  ),
+                ],
+              ),
+            ),
+            const Divider(height: 1),
+            Flexible(
+              child: ListView(
+                shrinkWrap: true,
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                children: [
+                  _YearTile(
+                    label: 'Tất cả các năm',
+                    selected: selectedYear == null,
+                    onTap: () => Navigator.pop(context, -1),
+                  ),
+                  for (final year in years)
+                    _YearTile(
+                      label: '$year',
+                      selected: year == selectedYear,
+                      onTap: () => Navigator.pop(context, year),
+                    ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _YearTile extends StatelessWidget {
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _YearTile({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    return ListTile(
+      dense: true,
+      leading: Icon(
+        selected ? Icons.check_circle : Icons.circle_outlined,
+        size: 20,
+        color: selected ? cs.primary : Colors.grey,
+      ),
+      title: Text(
+        label,
+        style: TextStyle(
+          fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+          color: selected ? cs.primary : null,
+        ),
+      ),
+      onTap: onTap,
     );
   }
 }

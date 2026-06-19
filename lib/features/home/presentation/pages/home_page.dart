@@ -92,10 +92,6 @@ class _HomeView extends StatelessWidget {
               end: Alignment.bottomRight,
             ),
           ),
-          child: const Align(
-            alignment: Alignment(0.85, -0.1),
-            child: Icon(Icons.auto_graph, size: 76, color: Colors.white12),
-          ),
         ),
       ),
     );
@@ -207,28 +203,17 @@ class _HomeView extends StatelessWidget {
     }
     if (state.hasMore) {
       return SliverToBoxAdapter(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 12, 16, 28),
-          child: Center(
-            child: TextButton.icon(
-              onPressed: cubit.loadMore,
-              icon: const Icon(Icons.expand_more),
-              label: const Text('Load More Results'),
-              style: TextButton.styleFrom(
-                foregroundColor: Theme.of(context).colorScheme.primary,
-                textStyle: const TextStyle(fontWeight: FontWeight.w600),
-              ),
-            ),
-          ),
-        ),
+        child: Padding(padding: const EdgeInsets.fromLTRB(16, 12, 16, 28)),
       );
     }
     return const SliverToBoxAdapter(
       child: Padding(
         padding: EdgeInsets.fromLTRB(16, 16, 16, 28),
         child: Center(
-          child: Text('— Đã hết chủ đề —',
-              style: TextStyle(fontSize: 12, color: Colors.grey)),
+          child: Text(
+            '— Đã hết chủ đề —',
+            style: TextStyle(fontSize: 12, color: Colors.grey),
+          ),
         ),
       ),
     );
