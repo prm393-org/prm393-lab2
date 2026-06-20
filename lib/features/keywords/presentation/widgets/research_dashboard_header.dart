@@ -75,6 +75,8 @@ class ResearchDashboardHeader extends StatelessWidget {
                   fontWeight: FontWeight.w800,
                   height: 1.15,
                 ),
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
               ),
               if (metadata.isNotEmpty) ...[
                 const SizedBox(height: 7),
@@ -83,6 +85,8 @@ class ResearchDashboardHeader extends StatelessWidget {
                   style: tt.bodyMedium?.copyWith(
                     color: Colors.white.withValues(alpha: 0.82),
                   ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
               const SizedBox(height: 14),

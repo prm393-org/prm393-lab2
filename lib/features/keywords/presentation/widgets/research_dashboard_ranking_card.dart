@@ -59,12 +59,16 @@ class ResearchDashboardRankingCard extends StatelessWidget {
                         style: tt.titleMedium?.copyWith(
                           fontWeight: FontWeight.w700,
                         ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                       Text(
                         subtitle,
                         style: tt.labelSmall?.copyWith(
                           color: cs.onSurface.withValues(alpha: 0.5),
                         ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ),

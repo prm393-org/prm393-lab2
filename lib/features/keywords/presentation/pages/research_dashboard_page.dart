@@ -64,7 +64,7 @@ class _ResearchDashboardView extends StatelessWidget {
                 ),
             ],
           ),
-          body: _buildBody(context, state),
+          body: SafeArea(top: false, child: _buildBody(context, state)),
         );
       },
     );
@@ -127,7 +127,10 @@ class _ResearchDashboardView extends StatelessWidget {
           ),
           if (summary.yearlyTrend.length >= 2) ...[
             const SizedBox(height: 12),
-            TrendChart(trend: summary.yearlyTrend),
+            SizedBox(
+              width: double.infinity,
+              child: TrendChart(trend: summary.yearlyTrend),
+            ),
           ],
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),

@@ -53,20 +53,25 @@ class ResearchDashboardKpiGrid extends StatelessWidget {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final columns = constraints.maxWidth >= 720 ? 3 : 2;
-        final ratio = constraints.maxWidth < 350 ? 1.02 : 1.14;
+        const spacing = 12.0;
+        final columns = constraints.maxWidth >= 720
+            ? 3
+            : constraints.maxWidth >= 320
+            ? 2
+            : 1;
+        final cardWidth =
+            (constraints.maxWidth - spacing * (columns - 1)) / columns;
 
-        return GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: cards.length,
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: columns,
-            crossAxisSpacing: 12,
-            mainAxisSpacing: 12,
-            childAspectRatio: ratio,
-          ),
-          itemBuilder: (context, index) => _KpiCard(data: cards[index]),
+        return Wrap(
+          spacing: spacing,
+          runSpacing: spacing,
+          children: [
+            for (final card in cards)
+              SizedBox(
+                width: cardWidth,
+                child: _KpiCard(data: card),
+              ),
+          ],
         );
       },
     );
@@ -122,6 +127,7 @@ class _KpiCard extends StatelessWidget {
                       fontWeight: FontWeight.w600,
                     ),
                     maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
                 Container(
@@ -135,7 +141,7 @@ class _KpiCard extends StatelessWidget {
                 ),
               ],
             ),
-            const Spacer(),
+            const SizedBox(height: 16),
             Text(
               data.value,
               style: (data.isTextValue ? tt.titleMedium : tt.headlineSmall)

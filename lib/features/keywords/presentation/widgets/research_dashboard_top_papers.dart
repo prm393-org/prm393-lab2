@@ -56,12 +56,16 @@ class ResearchDashboardTopPapers extends StatelessWidget {
                         style: tt.titleMedium?.copyWith(
                           fontWeight: FontWeight.w700,
                         ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
                       Text(
                         'Citation impact within the loaded sample',
                         style: tt.labelSmall?.copyWith(
                           color: cs.onSurface.withValues(alpha: 0.5),
                         ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ),
@@ -162,29 +166,35 @@ class _PaperRow extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 9),
-                  Wrap(
-                    spacing: 7,
-                    runSpacing: 6,
-                    children: [
-                      _MetaChip(
-                        icon: Icons.format_quote,
-                        label:
-                            '${NumberFormatter.compact(paper.citedByCount)} citations',
-                        color: cs.primary,
-                      ),
-                      _MetaChip(
-                        icon: Icons.calendar_today_outlined,
-                        label: paper.publicationYear?.toString() ?? 'Year N/A',
-                        color: cs.onSurfaceVariant,
-                      ),
-                      _MetaChip(
-                        icon: Icons.library_books_outlined,
-                        label: paper.sourceName?.trim().isNotEmpty ?? false
-                            ? paper.sourceName!
-                            : 'Unknown Journal',
-                        color: cs.onSurfaceVariant,
-                      ),
-                    ],
+                  LayoutBuilder(
+                    builder: (context, constraints) => Wrap(
+                      spacing: 7,
+                      runSpacing: 6,
+                      children: [
+                        _MetaChip(
+                          icon: Icons.format_quote,
+                          label:
+                              '${NumberFormatter.compact(paper.citedByCount)} citations',
+                          color: cs.primary,
+                          maxWidth: constraints.maxWidth,
+                        ),
+                        _MetaChip(
+                          icon: Icons.calendar_today_outlined,
+                          label:
+                              paper.publicationYear?.toString() ?? 'Year N/A',
+                          color: cs.onSurfaceVariant,
+                          maxWidth: constraints.maxWidth,
+                        ),
+                        _MetaChip(
+                          icon: Icons.library_books_outlined,
+                          label: paper.sourceName?.trim().isNotEmpty ?? false
+                              ? paper.sourceName!
+                              : 'Unknown Journal',
+                          color: cs.onSurfaceVariant,
+                          maxWidth: constraints.maxWidth,
+                        ),
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 10),
                   ClipRRect(
@@ -212,17 +222,19 @@ class _MetaChip extends StatelessWidget {
   final IconData icon;
   final String label;
   final Color color;
+  final double maxWidth;
 
   const _MetaChip({
     required this.icon,
     required this.label,
     required this.color,
+    required this.maxWidth,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      constraints: const BoxConstraints(maxWidth: 210),
+      constraints: BoxConstraints(maxWidth: maxWidth),
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.08),
