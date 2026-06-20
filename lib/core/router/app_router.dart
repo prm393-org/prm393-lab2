@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 import '../../features/home/presentation/pages/home_page.dart';
 import '../../features/journal/presentation/pages/journal_page.dart';
 import '../../features/journal/presentation/pages/publication_detail_page.dart';
-import '../../features/keywords/presentation/pages/keywords_page.dart';
+import '../../features/keywords/presentation/pages/research_dashboard_page.dart';
 import '../../features/profile/presentation/pages/profile_page.dart';
 import '../../features/publication/domain/entities/work.dart';
 import '../navigation/main_scaffold.dart';
@@ -34,9 +34,8 @@ class AppRouter {
                 routes: [
                   GoRoute(
                     path: 'detail',
-                    builder: (context, state) => PublicationDetailPage(
-                      work: state.extra as Work,
-                    ),
+                    builder: (context, state) =>
+                        PublicationDetailPage(work: state.extra as Work),
                   ),
                 ],
               ),
@@ -46,7 +45,7 @@ class AppRouter {
             routes: [
               GoRoute(
                 path: '/keywords',
-                builder: (context, state) => const KeywordsPage(),
+                builder: (context, state) => const ResearchDashboardPage(),
               ),
             ],
           ),

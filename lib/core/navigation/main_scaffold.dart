@@ -33,9 +33,9 @@ class MainScaffold extends StatelessWidget {
             label: 'Journal',
           ),
           NavigationDestination(
-            icon: Icon(Icons.tag_outlined),
-            selectedIcon: Icon(Icons.tag),
-            label: 'Keywords',
+            icon: Icon(Icons.dashboard_outlined),
+            selectedIcon: Icon(Icons.dashboard),
+            label: 'Dashboard',
           ),
           NavigationDestination(
             icon: Icon(Icons.person_outline),

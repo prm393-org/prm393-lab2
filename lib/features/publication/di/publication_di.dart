@@ -4,6 +4,8 @@ import '../../../core/network/api_client.dart';
 import '../../../core/network/network_info.dart';
 import '../../home/presentation/cubit/home_cubit.dart';
 import '../../journal/presentation/cubit/journal_cubit.dart';
+import '../../keywords/domain/usecases/build_research_dashboard.dart';
+import '../../keywords/presentation/cubit/research_dashboard_cubit.dart';
 import '../../shared/presentation/cubit/selected_topic_cubit.dart';
 import '../data/datasources/publication_remote_datasource.dart';
 import '../data/repositories/publication_repository_impl.dart';
@@ -30,6 +32,7 @@ void initPublicationFeature(GetIt sl) {
   sl.registerLazySingleton(() => SearchTopics(sl<PublicationRepository>()));
   sl.registerLazySingleton(() => GetWorksByTopic(sl<PublicationRepository>()));
   sl.registerLazySingleton(() => GetTopicTrend(sl<PublicationRepository>()));
+  sl.registerLazySingleton(() => const BuildResearchDashboard());
 
   // Shared state (singleton — cùng instance cho mọi tab)
   sl.registerSingleton<SelectedTopicCubit>(SelectedTopicCubit());
@@ -38,5 +41,11 @@ void initPublicationFeature(GetIt sl) {
   sl.registerFactory(() => HomeCubit(sl<SearchTopics>()));
   sl.registerFactory(
     () => JournalCubit(sl<GetWorksByTopic>(), sl<GetTopicTrend>()),
+  );
+  sl.registerFactory(
+    () => ResearchDashboardCubit(
+      sl<GetWorksByTopic>(),
+      sl<BuildResearchDashboard>(),
+    ),
   );
 }

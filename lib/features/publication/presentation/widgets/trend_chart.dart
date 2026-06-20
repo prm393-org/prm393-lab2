@@ -57,11 +57,15 @@ class TrendChart extends StatelessWidget {
               children: [
                 Icon(Icons.trending_up, size: 18, color: cs.primary),
                 const SizedBox(width: 6),
-                Text(
-                  'Xu hướng xuất bản',
-                  style: tt.titleSmall?.copyWith(fontWeight: FontWeight.w600),
+                Expanded(
+                  child: Text(
+                    'Xu hướng xuất bản',
+                    style: tt.titleSmall?.copyWith(fontWeight: FontWeight.w600),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
-                const Spacer(),
+                const SizedBox(width: 8),
                 Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
@@ -97,6 +101,8 @@ class TrendChart extends StatelessWidget {
               '· ${points.first.year}–${points.last.year}',
               style: tt.bodySmall
                   ?.copyWith(color: cs.onSurface.withValues(alpha: 0.5)),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
             const SizedBox(height: 20),
             SizedBox(
