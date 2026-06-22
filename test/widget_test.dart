@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -5,7 +6,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:journal_trend_analyzer/app.dart';
 import 'package:journal_trend_analyzer/core/di/injection.dart';
 import 'package:journal_trend_analyzer/core/error/failures.dart';
+import 'package:journal_trend_analyzer/core/network/api_client.dart';
 import 'package:journal_trend_analyzer/features/home/presentation/cubit/home_cubit.dart';
+import 'package:journal_trend_analyzer/features/profile/domain/entities/user_settings.dart';
+import 'package:journal_trend_analyzer/features/profile/domain/repositories/profile_repository.dart';
+import 'package:journal_trend_analyzer/features/profile/presentation/cubit/profile_cubit.dart';
 import 'package:journal_trend_analyzer/features/publication/domain/entities/paged.dart';
 import 'package:journal_trend_analyzer/features/publication/domain/entities/topic.dart';
 import 'package:journal_trend_analyzer/features/publication/domain/entities/trend_point.dart';
@@ -20,11 +25,14 @@ void main() {
     final repository = _InMemoryPublicationRepository();
     getIt.registerSingleton<SelectedTopicCubit>(SelectedTopicCubit());
     getIt.registerFactory<HomeCubit>(() => HomeCubit(SearchTopics(repository)));
+    getIt.registerLazySingleton<ProfileCubit>(
+      () => ProfileCubit(_InMemoryProfileRepository(), ApiClient(Dio())),
+    );
   });
 
   tearDown(() => getIt.reset());
 
-  testWidgets('App khởi động và hiển thị trang setup placeholder', (
+  testWidgets('App starts and shows setup placeholder page', (
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(const App());
@@ -66,4 +74,20 @@ class _InMemoryPublicationRepository implements PublicationRepository {
   ) async {
     return const Right([]);
   }
+
+  @override
+  Future<Either<Failure, Work>> getWorkById(String workId) async {
+    return Left(ServerFailure('Not implemented in test', statusCode: 501));
+  }
+}
+
+class _InMemoryProfileRepository implements ProfileRepository {
+  @override
+  Future<UserSettings> loadSettings() async => const UserSettings();
+
+  @override
+  Future<void> saveSettings(UserSettings settings) async {}
+
+  @override
+  Future<void> resetSettings() async {}
 }

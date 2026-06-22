@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/app_colors.dart';
 import '../../../../core/utils/number_formatter.dart';
 import '../../../publication/domain/entities/work.dart';
 
@@ -135,7 +136,7 @@ class _OaBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: const Color(0xFF16A34A).withValues(alpha: 0.12),
+        color: AppColors.accentTealBg,
         borderRadius: BorderRadius.circular(20),
       ),
       child: const Text(
@@ -143,7 +144,7 @@ class _OaBadge extends StatelessWidget {
         style: TextStyle(
           fontSize: 10,
           fontWeight: FontWeight.w600,
-          color: Color(0xFF16A34A),
+          color: AppColors.accentTealDark,
         ),
       ),
     );

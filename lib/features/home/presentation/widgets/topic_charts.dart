@@ -31,9 +31,9 @@ class _TopicChartsSectionState extends State<TopicChartsSection> {
   int _page = 0;
 
   static const _titles = [
-    'Top bài báo',
-    'Bài báo × Trích dẫn',
-    'Tỷ trọng lĩnh vực',
+    'Top papers',
+    'Papers × Citations',
+    'Domain share',
   ];
   static const _icons = [
     Icons.bar_chart_rounded,
@@ -192,7 +192,7 @@ class _TopicChartsSectionState extends State<TopicChartsSection> {
             const SizedBox(height: 6),
             Center(
               child: Text(
-                'Chạm vào biểu đồ để chọn chủ đề',
+                'Tap a chart to select a topic',
                 style: tt.labelSmall
                     ?.copyWith(color: cs.onSurface.withValues(alpha: 0.4)),
               ),
@@ -205,8 +205,8 @@ class _TopicChartsSectionState extends State<TopicChartsSection> {
 
   String _shortLabel(int i) => switch (i) {
         0 => 'Top',
-        1 => 'Tương quan',
-        _ => 'Lĩnh vực',
+        1 => 'Correlation',
+        _ => 'Domain',
       };
 }
 
@@ -293,8 +293,8 @@ class _BarRow extends StatelessWidget {
 
     return Semantics(
       button: true,
-      label: 'Hạng $rank: ${topic.displayName}, '
-          '${topic.worksCount} bài báo, ${topic.citedByCount} trích dẫn',
+      label: 'Rank $rank: ${topic.displayName}, '
+          '${topic.worksCount} papers, ${topic.citedByCount} citations',
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(8),
@@ -324,7 +324,7 @@ class _BarRow extends StatelessWidget {
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            '${NumberFormatter.compact(topic.worksCount)} bài',
+                            '${NumberFormatter.compact(topic.worksCount)} papers',
                             style: tt.labelSmall?.copyWith(
                               color: cs.primary,
                               fontWeight: FontWeight.bold,
@@ -350,7 +350,7 @@ class _BarRow extends StatelessWidget {
                               color: cs.onSurface.withValues(alpha: 0.45)),
                           const SizedBox(width: 3),
                           Text(
-                            '${NumberFormatter.compact(topic.citedByCount)} trích dẫn',
+                            '${NumberFormatter.compact(topic.citedByCount)} citations',
                             style: tt.labelSmall?.copyWith(
                               fontSize: 10,
                               color: cs.onSurface.withValues(alpha: 0.5),
@@ -447,9 +447,9 @@ class _BubbleChart extends StatelessWidget {
         );
 
     return Semantics(
-      label: 'Biểu đồ tương quan số bài báo và số trích dẫn của '
-          '${pts.length} chủ đề. Kích thước bong bóng thể hiện trung bình '
-          'trích dẫn mỗi bài. Chạm vào bong bóng để chọn chủ đề.',
+      label: 'Correlation chart of papers and citations for '
+          '${pts.length} topics. Bubble size shows average citations '
+          'per paper. Tap a bubble to select a topic.',
       child: Column(
         children: [
           Expanded(
@@ -478,8 +478,8 @@ class _BubbleChart extends StatelessWidget {
                         children: [
                           TextSpan(
                             text:
-                                '\n${NumberFormatter.compact(t.worksCount)} bài · '
-                                '${NumberFormatter.compact(t.citedByCount)} trích dẫn',
+                                '\n${NumberFormatter.compact(t.worksCount)} papers · '
+                                '${NumberFormatter.compact(t.citedByCount)} citations',
                             style: TextStyle(
                               color: cs.onInverseSurface
                                   .withValues(alpha: 0.85),
@@ -501,7 +501,7 @@ class _BubbleChart extends StatelessWidget {
                 ),
                 titlesData: FlTitlesData(
                   leftTitles: AxisTitles(
-                    axisNameWidget: Text('Trích dẫn',
+                    axisNameWidget: Text('Citations',
                         style: TextStyle(
                             fontSize: 9,
                             color: cs.onSurface.withValues(alpha: 0.5))),
@@ -514,7 +514,7 @@ class _BubbleChart extends StatelessWidget {
                     ),
                   ),
                   bottomTitles: AxisTitles(
-                    axisNameWidget: Text('Bài báo',
+                    axisNameWidget: Text('Papers',
                         style: TextStyle(
                             fontSize: 9,
                             color: cs.onSurface.withValues(alpha: 0.5))),
@@ -555,7 +555,7 @@ class _BubbleChart extends StatelessWidget {
               const SizedBox(width: 6),
               Flexible(
                 child: Text(
-                  'Bong bóng lớn = nhiều trích dẫn/bài · trục log',
+                  'Larger bubble = more citations per paper · log scale',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: tt.labelSmall?.copyWith(
@@ -591,7 +591,7 @@ class _DomainShareChart extends StatelessWidget {
 
     final groups = <String, List<Topic>>{};
     for (final t in topics) {
-      groups.putIfAbsent(t.domainName ?? 'Khác', () => []).add(t);
+      groups.putIfAbsent(t.domainName ?? 'Other', () => []).add(t);
     }
     final entries = groups.entries.toList()
       ..sort((a, b) => _sum(b.value).compareTo(_sum(a.value)));
@@ -600,7 +600,7 @@ class _DomainShareChart extends StatelessWidget {
     final total = entries.fold<int>(0, (s, e) => s + _sum(e.value));
 
     Color colorOf(String key) =>
-        DomainPalette.of(key == 'Khác' ? null : key);
+        DomainPalette.of(key == 'Other' ? null : key);
 
     void selectTop(List<Topic> ts) {
       final top = [...ts]
@@ -691,7 +691,7 @@ class _DomainShareChart extends StatelessWidget {
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          '${e.value.length} chủ đề · ${(frac * 100).round()}%',
+                          '${e.value.length} topics · ${(frac * 100).round()}%',
                           style: tt.labelSmall?.copyWith(
                               color: cs.onSurface.withValues(alpha: 0.6)),
                         ),

@@ -15,6 +15,8 @@ class TopicFilterBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
     return SizedBox(
       height: 40,
       child: ListView.separated(
@@ -29,16 +31,16 @@ class TopicFilterBar extends StatelessWidget {
             label: Text(f.label),
             selected: isSel,
             onSelected: (_) => onChanged(f),
+            backgroundColor: cs.surfaceContainerHighest,
+            selectedColor: cs.primary,
             labelStyle: TextStyle(
               fontSize: 13,
-              fontWeight: isSel ? FontWeight.w600 : FontWeight.w400,
-              color: isSel
-                  ? Theme.of(context).colorScheme.onPrimary
-                  : Theme.of(context).colorScheme.onSurface,
+              fontWeight: isSel ? FontWeight.w600 : FontWeight.w500,
+              color: isSel ? cs.onPrimary : cs.onSurface,
             ),
-            selectedColor: Theme.of(context).colorScheme.primary,
             showCheckmark: false,
             visualDensity: VisualDensity.compact,
+            side: BorderSide.none,
           );
         },
       ),

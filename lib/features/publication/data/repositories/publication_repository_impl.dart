@@ -61,6 +61,10 @@ class PublicationRepositoryImpl implements PublicationRepository {
   Future<Either<Failure, List<TrendPoint>>> getTopicTrend(String topicId) =>
       _run(() => _datasource.getTopicTrend(topicId));
 
+  @override
+  Future<Either<Failure, Work>> getWorkById(String workId) =>
+      _run(() => _datasource.getWorkById(workId));
+
   Future<Either<Failure, T>> _run<T>(Future<T> Function() call) async {
     if (!await _networkInfo.isConnected) return const Left(NetworkFailure());
     try {

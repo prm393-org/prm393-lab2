@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/di/injection.dart';
+import '../../../../core/router/work_detail_navigation.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../core/widgets/error_state_widget.dart';
@@ -136,8 +137,7 @@ class _ResearchDashboardView extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: ResearchDashboardTopPapers(
               papers: summary.topPapers,
-              onPaperTap: (paper) =>
-                  context.push('/journal/detail', extra: paper),
+              onPaperTap: (paper) => openWorkDetail(context, paper),
             ),
           ),
           const SizedBox(height: 16),
@@ -159,7 +159,7 @@ class _ResearchDashboardView extends StatelessWidget {
               subtitle: 'By contributing papers in the sample',
               icon: Icons.groups_outlined,
               items: summary.topAuthors,
-              accent: AppColors.secondary,
+              accent: AppColors.tertiary,
             ),
           ),
         ],

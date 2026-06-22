@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/app_colors.dart';
 import '../../../../core/utils/number_formatter.dart';
 import '../../../publication/domain/entities/topic.dart';
-import 'domain_palette.dart';
 
 /// Thẻ topic: domain/field, display_name, description, keywords,
 /// works_count, cited_by_count và trung bình trích dẫn.
@@ -22,7 +22,6 @@ class TopicCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final tt = Theme.of(context).textTheme;
-    final accent = DomainPalette.of(topic.domainName);
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
@@ -45,7 +44,7 @@ class TopicCard extends StatelessWidget {
               Row(
                 children: [
                   if (topic.domainName != null)
-                    _badge(topic.domainName!.toUpperCase(), accent),
+                    _badge(topic.domainName!),
                   const Spacer(),
                   if (isSelected)
                     Row(
@@ -55,7 +54,7 @@ class TopicCard extends StatelessWidget {
                             size: 14, color: cs.primary),
                         const SizedBox(width: 4),
                         Text(
-                          'Đang chọn',
+                          'Selected',
                           style: tt.labelSmall?.copyWith(
                             color: cs.primary,
                             fontWeight: FontWeight.w600,
@@ -110,21 +109,21 @@ class TopicCard extends StatelessWidget {
                   _stat(
                     context,
                     icon: Icons.description_outlined,
-                    label: 'Bài báo',
+                    label: 'Papers',
                     value: NumberFormatter.compact(topic.worksCount),
                   ),
                   _stat(
                     context,
                     icon: Icons.format_quote,
-                    label: 'Trích dẫn',
+                    label: 'Citations',
                     value: NumberFormatter.compact(topic.citedByCount),
                   ),
                   _stat(
                     context,
                     icon: Icons.trending_up,
-                    label: 'TB trích dẫn',
+                    label: 'Avg. citations',
                     value: topic.avgCitations.toStringAsFixed(1),
-                    color: accent,
+                    color: cs.primary,
                   ),
                 ],
               ),
@@ -135,20 +134,20 @@ class TopicCard extends StatelessWidget {
     );
   }
 
-  Widget _badge(String text, Color color) {
+  Widget _badge(String text) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(6),
+        color: AppColors.accentMintBg,
+        borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
-        text,
-        style: TextStyle(
+        text.toUpperCase(),
+        style: const TextStyle(
           fontSize: 9.5,
           fontWeight: FontWeight.w700,
-          letterSpacing: 0.5,
-          color: color,
+          letterSpacing: 0.4,
+          color: AppColors.accentMintText,
         ),
       ),
     );
@@ -158,12 +157,16 @@ class TopicCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: cs.surfaceContainerHighest,
+        color: cs.primaryContainer,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
         k,
-        style: TextStyle(fontSize: 11, color: cs.onSurfaceVariant),
+        style: TextStyle(
+          fontSize: 11,
+          color: cs.onPrimaryContainer,
+          fontWeight: FontWeight.w500,
+        ),
       ),
     );
   }

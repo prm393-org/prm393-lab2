@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/router/work_detail_navigation.dart';
 import '../../../../core/utils/number_formatter.dart';
 import '../../domain/entities/work.dart';
 
@@ -24,7 +25,7 @@ class WorkCard extends StatelessWidget {
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
-        onTap: onTap ?? () => context.push('/journal/detail', extra: work),
+        onTap: onTap ?? () => openWorkDetail(context, work),
         child: Padding(
           padding: const EdgeInsets.all(14),
           child: Column(
@@ -74,7 +75,7 @@ class WorkCard extends StatelessWidget {
                       size: 14, color: cs.onSurfaceVariant),
                   const SizedBox(width: 4),
                   Text(
-                    '${NumberFormatter.compact(work.citedByCount)} trích dẫn',
+                    '${NumberFormatter.compact(work.citedByCount)} citations',
                     style:
                         tt.labelSmall?.copyWith(color: cs.onSurfaceVariant),
                   ),
@@ -84,8 +85,7 @@ class WorkCard extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(
-                        color:
-                            const Color(0xFF16A34A).withValues(alpha: 0.1),
+                        color: AppColors.accentTealBg,
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: const Text(
@@ -93,7 +93,7 @@ class WorkCard extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF16A34A),
+                          color: AppColors.accentTealDark,
                         ),
                       ),
                     ),

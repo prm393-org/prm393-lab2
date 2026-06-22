@@ -1,5 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../../core/constants/app_constants.dart';
 import '../../../publication/domain/entities/topic.dart';
 import '../../../publication/domain/usecases/search_topics.dart';
 import 'home_state.dart';
@@ -15,9 +18,17 @@ class HomeCubit extends Cubit<HomeState> {
   String? _query;
   int _page = 1;
 
-  Future<void> initialize() {
-    if (state is! HomeInitial) return Future.value();
-    return _load(reset: true);
+  Future<void> initialize() async {
+    if (state is! HomeInitial) return;
+    if (GetIt.I.isRegistered<SharedPreferences>()) {
+      final raw = GetIt.I<SharedPreferences>()
+          .getString(AppConstants.prefDefaultHomeFilter);
+      if (raw != null) {
+        _filter =
+            TopicSortFilter.values.asNameMap()[raw] ?? TopicSortFilter.popular;
+      }
+    }
+    await _load(reset: true);
   }
 
   Future<void> search(String query) {

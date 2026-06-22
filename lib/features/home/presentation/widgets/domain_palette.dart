@@ -1,30 +1,34 @@
 import 'package:flutter/material.dart';
 
-/// Bảng màu cố định cho từng domain của OpenAlex — dùng chung
-/// giữa topic card và biểu đồ treemap để màu nhất quán.
+import '../../../../core/theme/app_colors.dart';
+
+/// Màu biểu đồ / domain theo Academic Insight Logic.
 class DomainPalette {
   DomainPalette._();
 
   static const Map<String, Color> _byDomain = {
-    'Physical Sciences': Color(0xFF2563EB),
-    'Life Sciences': Color(0xFF16A34A),
-    'Health Sciences': Color(0xFFDC2626),
-    'Social Sciences': Color(0xFF7C3AED),
+    'Physical Sciences': AppColors.primary,
+    'Life Sciences': AppColors.tertiary,
+    'Health Sciences': AppColors.secondary,
+    'Social Sciences': AppColors.neutral,
   };
 
   static const List<Color> _fallback = [
-    Color(0xFF2563EB),
-    Color(0xFF16A34A),
-    Color(0xFFDC2626),
-    Color(0xFF7C3AED),
-    Color(0xFFEA580C),
-    Color(0xFF0891B2),
-    Color(0xFFCA8A04),
-    Color(0xFFDB2777),
+    AppColors.primary,
+    AppColors.secondary,
+    AppColors.tertiary,
+    AppColors.neutral,
+    Color(0xFF3B5998),
+    Color(0xFF0D524D),
   ];
 
   static Color of(String? domain) {
-    if (domain == null) return _fallback.first;
-    return _byDomain[domain] ?? _fallback[domain.hashCode.abs() % _fallback.length];
+    if (domain == null) return AppColors.primary;
+    return _byDomain[domain] ??
+        _fallback[domain.hashCode.abs() % _fallback.length];
   }
+
+  static Color badgeBackground(String? domain) => AppColors.accentTealBg;
+
+  static Color badgeForeground(String? domain) => AppColors.accentTealDark;
 }

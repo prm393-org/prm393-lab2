@@ -1,6 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/app_colors.dart';
 import '../../../../core/utils/number_formatter.dart';
 import '../../domain/entities/trend_point.dart';
 
@@ -38,8 +39,7 @@ class TrendChart extends StatelessWidget {
     final firstHalf = points.take(mid).fold<int>(0, (s, p) => s + p.count);
     final lastHalf = points.skip(mid).fold<int>(0, (s, p) => s + p.count);
     final rising = lastHalf >= firstHalf;
-    final trendColor =
-        rising ? const Color(0xFF16A34A) : const Color(0xFFDC2626);
+    final trendColor = rising ? AppColors.success : AppColors.error;
 
     return Card(
       margin: const EdgeInsets.fromLTRB(16, 4, 16, 12),
@@ -59,7 +59,7 @@ class TrendChart extends StatelessWidget {
                 const SizedBox(width: 6),
                 Expanded(
                   child: Text(
-                    'Xu hướng xuất bản',
+                    'Publication trend',
                     style: tt.titleSmall?.copyWith(fontWeight: FontWeight.w600),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -83,7 +83,7 @@ class TrendChart extends StatelessWidget {
                       ),
                       const SizedBox(width: 3),
                       Text(
-                        rising ? 'Tăng' : 'Giảm',
+                        rising ? 'Rising' : 'Declining',
                         style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
@@ -97,7 +97,7 @@ class TrendChart extends StatelessWidget {
             ),
             const SizedBox(height: 2),
             Text(
-              'Tổng ${NumberFormatter.compact(total)} bài báo '
+              'Total ${NumberFormatter.compact(total)} papers '
               '· ${points.first.year}–${points.last.year}',
               style: tt.bodySmall
                   ?.copyWith(color: cs.onSurface.withValues(alpha: 0.5)),
@@ -126,7 +126,7 @@ class TrendChart extends StatelessWidget {
                           children: [
                             TextSpan(
                               text:
-                                  '${NumberFormatter.compact(p.count)} bài',
+                                  '${NumberFormatter.compact(p.count)} papers',
                               style: TextStyle(
                                 color: cs.onInverseSurface
                                     .withValues(alpha: 0.8),

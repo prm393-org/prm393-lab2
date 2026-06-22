@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/di/injection.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/router/work_detail_navigation.dart';
 import '../../../../core/widgets/error_state_widget.dart';
 import '../../../../core/widgets/loading_widget.dart';
 import '../../../publication/domain/entities/topic.dart';
@@ -47,6 +49,7 @@ class _JournalView extends StatelessWidget {
     return BlocBuilder<JournalCubit, JournalState>(
       builder: (context, state) {
         return CustomScrollView(
+          physics: const ClampingScrollPhysics(),
           slivers: [_buildAppBar(context, state), _buildBody(context, state)],
         );
       },
@@ -60,68 +63,70 @@ class _JournalView extends StatelessWidget {
       JournalError s => s.topic,
       _ => null,
     };
+    final cs = Theme.of(context).colorScheme;
+    final tt = Theme.of(context).textTheme;
 
     return SliverAppBar(
-      expandedHeight: topic != null ? 130 : 90,
       pinned: true,
-      backgroundColor: const Color(0xFF1D4ED8),
+      stretch: false,
+      floating: false,
+      snap: false,
+      toolbarHeight: topic != null && topic.fieldName != null ? 72 : 64,
+      automaticallyImplyLeading: false,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      foregroundColor: cs.onSurface,
       surfaceTintColor: Colors.transparent,
       scrolledUnderElevation: 0,
       elevation: 0,
+      titleSpacing: 16,
+      centerTitle: false,
       actions: [
         if (state is JournalLoaded)
           IconButton(
-            icon: const Icon(Icons.refresh, color: Colors.white),
-            tooltip: 'Tải lại',
+            icon: Icon(Icons.refresh, color: cs.onSurface),
+            tooltip: 'Reload',
             onPressed: () =>
                 context.read<JournalCubit>().loadByTopic(state.topic),
           ),
       ],
-      flexibleSpace: FlexibleSpaceBar(
-        titlePadding: const EdgeInsets.only(left: 16, bottom: 14, right: 56),
-        title: topic != null
-            ? Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
+      title: topic != null
+          ? Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  topic.displayName,
+                  style: tt.titleSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    height: 1.2,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                if (topic.fieldName != null) ...[
+                  const SizedBox(height: 2),
                   Text(
-                    topic.displayName,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
+                    topic.fieldName!,
+                    style: tt.labelSmall?.copyWith(
+                      color: cs.onSurfaceVariant,
+                      fontSize: 11,
+                      height: 1.2,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  if (topic.fieldName != null)
-                    Text(
-                      topic.fieldName!,
-                      style: const TextStyle(
-                        color: Colors.white70,
-                        fontSize: 11,
-                      ),
-                    ),
                 ],
-              )
-            : const Text(
-                'Bài báo',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20,
-                ),
+              ],
+            )
+          : Text(
+              'Papers',
+              style: tt.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+                height: 1.2,
               ),
-        background: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Color(0xFF6D28D9), Color(0xFF1D4ED8)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
             ),
-          ),
-        ),
-      ),
     );
   }
 
@@ -138,25 +143,25 @@ class _JournalView extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF7C3AED).withValues(alpha: 0.1),
+                    color: AppColors.surfaceMuted,
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
                     Icons.touch_app_outlined,
                     size: 48,
-                    color: Color(0xFF7C3AED),
+                    color: AppColors.navy,
                   ),
                 ),
                 const SizedBox(height: 20),
                 Text(
-                  'Chưa chọn chủ đề',
+                  'No topic selected',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Về tab Home, chọn một chủ đề\nđể xem danh sách bài báo.',
+                  'Go to the Home tab and select a topic\nto browse papers.',
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Theme.of(
@@ -168,9 +173,9 @@ class _JournalView extends StatelessWidget {
                 FilledButton.icon(
                   onPressed: () => context.go('/home'),
                   icon: const Icon(Icons.search),
-                  label: const Text('Tìm chủ đề'),
+                  label: const Text('Find topics'),
                   style: FilledButton.styleFrom(
-                    backgroundColor: const Color(0xFF7C3AED),
+                    backgroundColor: AppColors.navy,
                   ),
                 ),
               ],
@@ -182,7 +187,7 @@ class _JournalView extends StatelessWidget {
 
     if (state is JournalLoading) {
       return const SliverFillRemaining(
-        child: LoadingWidget(message: 'Đang tải bài báo…'),
+        child: LoadingWidget(message: 'Loading papers…'),
       );
     }
 
@@ -216,7 +221,7 @@ class _JournalView extends StatelessWidget {
               child: Row(
                 children: [
                   Text(
-                    '${state.works.length} / ${state.total} bài báo',
+                    '${state.works.length} / ${state.total} papers',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: Theme.of(
                         context,
@@ -225,7 +230,7 @@ class _JournalView extends StatelessWidget {
                   ),
                   const Spacer(),
                   Text(
-                    'Sắp xếp: ${state.sort.label}',
+                    'Sort: ${state.sort.label}',
                     style: Theme.of(context).textTheme.labelSmall?.copyWith(
                       color: Theme.of(context).colorScheme.primary,
                       fontWeight: FontWeight.w500,
@@ -253,7 +258,7 @@ class _JournalView extends StatelessWidget {
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: 48),
                 child: Center(
-                  child: Text('Không có bài báo nào phù hợp bộ lọc.'),
+                  child: Text('No papers match the current filters.'),
                 ),
               ),
             ),
@@ -261,8 +266,7 @@ class _JournalView extends StatelessWidget {
             itemCount: state.works.length,
             itemBuilder: (context, i) => WorkCard(
               work: state.works[i],
-              onTap: () =>
-                  context.push('/journal/detail', extra: state.works[i]),
+              onTap: () => openWorkDetail(context, state.works[i]),
             ),
           ),
           if (state.isLoadingMore && state.works.isNotEmpty)
@@ -301,7 +305,7 @@ class _JournalView extends StatelessWidget {
                 padding: EdgeInsets.fromLTRB(16, 16, 16, 28),
                 child: Center(
                   child: Text(
-                    '— Đã hết bài báo —',
+                    '— End of papers —',
                     style: TextStyle(fontSize: 12, color: Colors.grey),
                   ),
                 ),

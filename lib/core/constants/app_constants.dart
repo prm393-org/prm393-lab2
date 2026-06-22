@@ -6,6 +6,7 @@ class AppConstants {
 
   // App
   static const String appName = 'Journal Trend Analyzer';
+  static const String appVersion = '1.0.0';
 
   // OpenAlex API
   static const String openAlexBaseUrl = 'https://api.openalex.org';
@@ -22,6 +23,7 @@ class AppConstants {
   static const Duration receiveTimeout = Duration(seconds: 30);
 
   // SharedPreferences keys
+  static const String prefDisplayName = 'pref_display_name';
   static const String prefApiKey = 'pref_api_key';
   static const String prefMailto = 'pref_mailto';
   static const String prefRecentSearches = 'pref_recent_searches';

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/app_colors.dart';
+
 class KeywordsPage extends StatelessWidget {
   const KeywordsPage({super.key});
 
@@ -18,13 +20,13 @@ class KeywordsPage extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: const Color(0xFF7C3AED).withValues(alpha: 0.1),
+                color: AppColors.accentTealBg,
                 shape: BoxShape.circle,
               ),
               child: const Icon(
                 Icons.tag,
                 size: 48,
-                color: Color(0xFF7C3AED),
+                color: AppColors.accentTealDark,
               ),
             ),
             const SizedBox(height: 20),

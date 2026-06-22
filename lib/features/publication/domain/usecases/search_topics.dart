@@ -17,10 +17,10 @@ enum TopicSortFilter {
 
 extension TopicSortFilterX on TopicSortFilter {
   String get label => switch (this) {
-        TopicSortFilter.popular => 'Phổ biến',
-        TopicSortFilter.influence => 'Ảnh hưởng',
-        TopicSortFilter.quality => 'Chất lượng',
-        TopicSortFilter.byField => 'Theo lĩnh vực',
+        TopicSortFilter.popular => 'Popular',
+        TopicSortFilter.influence => 'Influence',
+        TopicSortFilter.quality => 'Quality',
+        TopicSortFilter.byField => 'By field',
       };
 
   /// Tham số `sort` gửi lên OpenAlex.

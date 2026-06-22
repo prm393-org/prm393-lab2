@@ -18,13 +18,13 @@ class ServerFailure extends Failure {
 }
 
 class NetworkFailure extends Failure {
-  const NetworkFailure([super.message = 'Không có kết nối mạng']);
+  const NetworkFailure([super.message = 'No network connection']);
 }
 
 class CacheFailure extends Failure {
-  const CacheFailure([super.message = 'Lỗi dữ liệu cục bộ']);
+  const CacheFailure([super.message = 'Local data error']);
 }
 
 class ParsingFailure extends Failure {
-  const ParsingFailure([super.message = 'Dữ liệu không hợp lệ']);
+  const ParsingFailure([super.message = 'Invalid data']);
 }

@@ -10,9 +10,9 @@ class WorkSortOption extends Equatable {
   final String value;
   const WorkSortOption(this.label, this.value);
 
-  static const citations = WorkSortOption('Trích dẫn', 'cited_by_count:desc');
-  static const newest = WorkSortOption('Mới nhất', 'publication_date:desc');
-  static const oldest = WorkSortOption('Cũ nhất', 'publication_date:asc');
+  static const citations = WorkSortOption('Citations', 'cited_by_count:desc');
+  static const newest = WorkSortOption('Newest', 'publication_date:desc');
+  static const oldest = WorkSortOption('Oldest', 'publication_date:asc');
 
   static const all = [citations, newest, oldest];
 
