@@ -27,4 +27,7 @@ abstract class PublicationRepository {
 
   /// Số bài báo theo năm của một topic — dữ liệu cho biểu đồ xu hướng (4.3).
   Future<Either<Failure, List<TrendPoint>>> getTopicTrend(String topicId);
+
+  /// Chi tiết đầy đủ một bài báo theo OpenAlex work ID.
+  Future<Either<Failure, Work>> getWorkById(String workId);
 }

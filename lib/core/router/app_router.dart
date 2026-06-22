@@ -33,9 +33,16 @@ class AppRouter {
                 builder: (context, state) => const JournalPage(),
                 routes: [
                   GoRoute(
-                    path: 'detail',
-                    builder: (context, state) =>
-                        PublicationDetailPage(work: state.extra as Work),
+                    path: 'detail/:workId',
+                    builder: (context, state) {
+                      final workId = state.pathParameters['workId']!;
+                      final preview =
+                          state.extra is Work ? state.extra as Work : null;
+                      return PublicationDetailPage(
+                        workId: workId,
+                        preview: preview,
+                      );
+                    },
                   ),
                 ],
               ),

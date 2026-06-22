@@ -27,6 +27,9 @@ abstract class PublicationRemoteDatasource {
 
   /// Số bài báo theo năm của một topic (OpenAlex `group_by`) — phục vụ 4.3.
   Future<List<TrendPoint>> getTopicTrend(String topicId);
+
+  /// Chi tiết một bài báo (`/works/{id}`) — phục vụ màn Publication Detail.
+  Future<WorkModel> getWorkById(String workId);
 }
 
 class PublicationRemoteDatasourceImpl implements PublicationRemoteDatasource {
@@ -71,6 +74,25 @@ class PublicationRemoteDatasourceImpl implements PublicationRemoteDatasource {
       },
       WorkModel.fromJson,
     );
+  }
+
+  @override
+  Future<WorkModel> getWorkById(String workId) async {
+    try {
+      final response =
+          await _apiClient.dio.get('/works/${_shortId(workId)}');
+      final data = response.data;
+      if (data is! Map<String, dynamic>) {
+        throw ParsingException('Invalid work response');
+      }
+      return WorkModel.fromJson(data);
+    } on DioException catch (e) {
+      throw _mapDioError(e);
+    } on ParsingException {
+      rethrow;
+    } catch (e) {
+      throw ParsingException('Unexpected error: $e');
+    }
   }
 
   @override

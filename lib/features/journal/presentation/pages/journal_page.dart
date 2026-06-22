@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/di/injection.dart';
+import '../../../../core/router/work_detail_navigation.dart';
 import '../../../../core/widgets/error_state_widget.dart';
 import '../../../../core/widgets/loading_widget.dart';
 import '../../../publication/domain/entities/topic.dart';
@@ -47,6 +48,7 @@ class _JournalView extends StatelessWidget {
     return BlocBuilder<JournalCubit, JournalState>(
       builder: (context, state) {
         return CustomScrollView(
+          physics: const ClampingScrollPhysics(),
           slivers: [_buildAppBar(context, state), _buildBody(context, state)],
         );
       },
@@ -63,7 +65,9 @@ class _JournalView extends StatelessWidget {
 
     return SliverAppBar(
       expandedHeight: topic != null ? 130 : 90,
+      collapsedHeight: kToolbarHeight,
       pinned: true,
+      stretch: false,
       backgroundColor: const Color(0xFF1D4ED8),
       surfaceTintColor: Colors.transparent,
       scrolledUnderElevation: 0,
@@ -261,8 +265,7 @@ class _JournalView extends StatelessWidget {
             itemCount: state.works.length,
             itemBuilder: (context, i) => WorkCard(
               work: state.works[i],
-              onTap: () =>
-                  context.push('/journal/detail', extra: state.works[i]),
+              onTap: () => openWorkDetail(context, state.works[i]),
             ),
           ),
           if (state.isLoadingMore && state.works.isNotEmpty)

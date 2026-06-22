@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
+import '../../../../core/router/work_detail_navigation.dart';
 import '../../../../core/utils/number_formatter.dart';
 import '../../domain/entities/work.dart';
 
@@ -24,7 +24,7 @@ class WorkCard extends StatelessWidget {
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
-        onTap: onTap ?? () => context.push('/journal/detail', extra: work),
+        onTap: onTap ?? () => openWorkDetail(context, work),
         child: Padding(
           padding: const EdgeInsets.all(14),
           child: Column(

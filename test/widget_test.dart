@@ -66,4 +66,9 @@ class _InMemoryPublicationRepository implements PublicationRepository {
   ) async {
     return const Right([]);
   }
+
+  @override
+  Future<Either<Failure, Work>> getWorkById(String workId) async {
+    return Left(ServerFailure('Not implemented in test', statusCode: 501));
+  }
 }
