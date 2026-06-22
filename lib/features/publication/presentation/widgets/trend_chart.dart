@@ -59,7 +59,7 @@ class TrendChart extends StatelessWidget {
                 const SizedBox(width: 6),
                 Expanded(
                   child: Text(
-                    'Xu hướng xuất bản',
+                    'Publication trend',
                     style: tt.titleSmall?.copyWith(fontWeight: FontWeight.w600),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -83,7 +83,7 @@ class TrendChart extends StatelessWidget {
                       ),
                       const SizedBox(width: 3),
                       Text(
-                        rising ? 'Tăng' : 'Giảm',
+                        rising ? 'Rising' : 'Declining',
                         style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
@@ -97,7 +97,7 @@ class TrendChart extends StatelessWidget {
             ),
             const SizedBox(height: 2),
             Text(
-              'Tổng ${NumberFormatter.compact(total)} bài báo '
+              'Total ${NumberFormatter.compact(total)} papers '
               '· ${points.first.year}–${points.last.year}',
               style: tt.bodySmall
                   ?.copyWith(color: cs.onSurface.withValues(alpha: 0.5)),
@@ -126,7 +126,7 @@ class TrendChart extends StatelessWidget {
                           children: [
                             TextSpan(
                               text:
-                                  '${NumberFormatter.compact(p.count)} bài',
+                                  '${NumberFormatter.compact(p.count)} papers',
                               style: TextStyle(
                                 color: cs.onInverseSurface
                                     .withValues(alpha: 0.8),

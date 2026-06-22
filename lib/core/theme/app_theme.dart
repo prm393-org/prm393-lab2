@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'app_colors.dart';
 
@@ -8,100 +9,152 @@ class AppTheme {
 
   static const _radius = 12.0;
 
-  static ThemeData get lightTheme {
-    const scheme = ColorScheme(
-      brightness: Brightness.light,
-      primary: AppColors.primary,
-      onPrimary: AppColors.white,
-      primaryContainer: AppColors.surfaceMuted,
-      onPrimaryContainer: AppColors.primary,
-      secondary: AppColors.secondary,
-      onSecondary: AppColors.white,
-      secondaryContainer: AppColors.surfaceMuted,
-      onSecondaryContainer: AppColors.primary,
-      tertiary: AppColors.tertiary,
-      onTertiary: AppColors.white,
-      surface: AppColors.white,
-      onSurface: AppColors.textPrimary,
-      onSurfaceVariant: AppColors.textSecondary,
-      outline: AppColors.border,
-      outlineVariant: AppColors.surfaceSubtle,
-      error: AppColors.error,
-      onError: AppColors.white,
-    );
+  static ThemeData get lightTheme => _buildTheme(
+        const ColorScheme(
+          brightness: Brightness.light,
+          primary: AppColors.primary,
+          onPrimary: AppColors.white,
+          primaryContainer: AppColors.surfaceMuted,
+          onPrimaryContainer: AppColors.primary,
+          secondary: AppColors.secondary,
+          onSecondary: AppColors.white,
+          secondaryContainer: AppColors.surfaceMuted,
+          onSecondaryContainer: AppColors.primary,
+          tertiary: AppColors.tertiary,
+          onTertiary: AppColors.white,
+          surface: AppColors.white,
+          onSurface: AppColors.textPrimary,
+          onSurfaceVariant: AppColors.textSecondary,
+          outline: AppColors.border,
+          outlineVariant: AppColors.surfaceSubtle,
+          surfaceContainerHighest: AppColors.surfaceSubtle,
+          error: AppColors.error,
+          onError: AppColors.white,
+        ),
+      );
+
+  static ThemeData get darkTheme => _buildTheme(
+        const ColorScheme(
+          brightness: Brightness.dark,
+          primary: AppColors.darkPrimaryAccent,
+          onPrimary: AppColors.darkBackground,
+          primaryContainer: AppColors.darkSurfaceMuted,
+          onPrimaryContainer: AppColors.darkOnSurface,
+          secondary: AppColors.secondary,
+          onSecondary: AppColors.white,
+          secondaryContainer: Color(0xFF312E81),
+          onSecondaryContainer: Color(0xFFC7D2FE),
+          tertiary: AppColors.tertiary,
+          onTertiary: AppColors.darkBackground,
+          surface: AppColors.darkSurfaceElevated,
+          onSurface: AppColors.darkOnSurface,
+          onSurfaceVariant: Color(0xFF94A3B8),
+          outline: AppColors.darkBorder,
+          outlineVariant: Color(0xFF1E293B),
+          surfaceContainerHighest: AppColors.darkSurfaceMuted,
+          error: AppColors.error,
+          onError: AppColors.white,
+        ),
+        scaffoldColor: AppColors.darkBackground,
+        cardColor: AppColors.darkSurfaceElevated,
+        navBarColor: AppColors.darkSurfaceElevated,
+        inputFillColor: AppColors.darkSurfaceMuted,
+      );
+
+  static ThemeData _buildTheme(
+    ColorScheme scheme, {
+    Color? scaffoldColor,
+    Color? cardColor,
+    Color? navBarColor,
+    Color? inputFillColor,
+  }) {
+    final isDark = scheme.brightness == Brightness.dark;
+    final scaffold = scaffoldColor ??
+        (isDark ? AppColors.darkBackground : AppColors.surface);
+    final card = cardColor ?? (isDark ? AppColors.darkSurfaceElevated : AppColors.white);
+    final navBar = navBarColor ?? (isDark ? AppColors.darkSurfaceElevated : AppColors.white);
+    final inputFill =
+        inputFillColor ?? (isDark ? AppColors.darkSurfaceMuted : AppColors.white);
 
     return ThemeData(
       useMaterial3: true,
-      brightness: Brightness.light,
+      brightness: scheme.brightness,
       colorScheme: scheme,
-      scaffoldBackgroundColor: AppColors.surface,
-      appBarTheme: const AppBarTheme(
+      scaffoldBackgroundColor: scaffold,
+      appBarTheme: AppBarTheme(
         centerTitle: false,
         elevation: 0,
         scrolledUnderElevation: 0,
         surfaceTintColor: Colors.transparent,
-        backgroundColor: AppColors.surface,
-        foregroundColor: AppColors.primary,
+        backgroundColor: scaffold,
+        foregroundColor: scheme.onSurface,
         titleTextStyle: TextStyle(
-          color: AppColors.primary,
+          color: scheme.onSurface,
           fontSize: 20,
           fontWeight: FontWeight.w700,
         ),
       ),
       cardTheme: CardThemeData(
         elevation: 0,
-        color: AppColors.white,
+        color: card,
         surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: const BorderSide(color: AppColors.border),
+          side: BorderSide(color: scheme.outlineVariant),
         ),
         margin: EdgeInsets.zero,
       ),
       navigationBarTheme: NavigationBarThemeData(
         elevation: 0,
-        height: 64,
-        backgroundColor: AppColors.white,
-        indicatorColor: AppColors.primary,
-        labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+        height: 56,
+        backgroundColor: navBar,
+        indicatorColor: isDark ? AppColors.secondary : AppColors.primary,
+        labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
         labelTextStyle: WidgetStateProperty.resolveWith((states) {
           final selected = states.contains(WidgetState.selected);
           return TextStyle(
             fontSize: 12,
             fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
-            color: selected ? AppColors.primary : AppColors.neutral,
+            color: selected
+                ? (isDark ? AppColors.darkOnSurface : AppColors.primary)
+                : scheme.onSurfaceVariant,
           );
         }),
         iconTheme: WidgetStateProperty.resolveWith((states) {
           final selected = states.contains(WidgetState.selected);
           return IconThemeData(
-            color: selected ? AppColors.white : AppColors.neutral,
+            color: selected ? AppColors.white : scheme.onSurfaceVariant,
             size: 22,
           );
         }),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: AppColors.white,
-        hintStyle: const TextStyle(color: AppColors.textMuted),
+        fillColor: inputFill,
+        labelStyle: TextStyle(color: scheme.onSurfaceVariant),
+        hintStyle: TextStyle(color: scheme.onSurfaceVariant.withValues(alpha: 0.8)),
         contentPadding: const EdgeInsets.symmetric(vertical: 14),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(_radius),
-          borderSide: const BorderSide(color: AppColors.border),
+          borderSide: BorderSide(color: scheme.outline),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(_radius),
-          borderSide: const BorderSide(color: AppColors.border),
+          borderSide: BorderSide(color: scheme.outline),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(_radius),
-          borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+          borderSide: BorderSide(color: scheme.primary, width: 1.5),
         ),
       ),
       chipTheme: ChipThemeData(
-        backgroundColor: AppColors.surfaceMuted,
-        selectedColor: AppColors.primary,
-        labelStyle: const TextStyle(fontSize: 13, color: AppColors.primary),
+        backgroundColor:
+            isDark ? AppColors.darkSurfaceMuted : AppColors.surfaceMuted,
+        selectedColor: isDark ? AppColors.secondary : AppColors.primary,
+        labelStyle: TextStyle(
+          fontSize: 13,
+          color: isDark ? AppColors.darkOnSurface : AppColors.primary,
+        ),
         secondaryLabelStyle: const TextStyle(
           fontSize: 13,
           color: AppColors.white,
@@ -114,26 +167,50 @@ class AppTheme {
         side: BorderSide.none,
         padding: const EdgeInsets.symmetric(horizontal: 4),
       ),
-      dividerTheme: const DividerThemeData(
-        color: AppColors.border,
+      segmentedButtonTheme: SegmentedButtonThemeData(
+        style: ButtonStyle(
+          foregroundColor: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.selected)) {
+              return AppColors.white;
+            }
+            return scheme.onSurface;
+          }),
+          backgroundColor: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.selected)) {
+              return isDark ? AppColors.secondary : AppColors.primary;
+            }
+            return isDark
+                ? AppColors.darkSurfaceMuted
+                : AppColors.surfaceMuted;
+          }),
+        ),
+      ),
+      dividerTheme: DividerThemeData(
+        color: scheme.outlineVariant,
         thickness: 1,
       ),
-      textTheme: const TextTheme(
+      textTheme: TextTheme(
         headlineSmall: TextStyle(
-          color: AppColors.textPrimary,
+          color: scheme.onSurface,
           fontWeight: FontWeight.w700,
         ),
         titleMedium: TextStyle(
-          color: AppColors.textPrimary,
+          color: scheme.onSurface,
           fontWeight: FontWeight.w600,
         ),
-        bodyMedium: TextStyle(color: AppColors.textSecondary, height: 1.45),
-        bodySmall: TextStyle(color: AppColors.textSecondary),
-        labelSmall: TextStyle(color: AppColors.textMuted, fontSize: 11),
+        bodyMedium: TextStyle(
+          color: scheme.onSurfaceVariant,
+          height: 1.45,
+        ),
+        bodySmall: TextStyle(color: scheme.onSurfaceVariant),
+        labelSmall: TextStyle(
+          color: scheme.onSurfaceVariant.withValues(alpha: 0.85),
+          fontSize: 11,
+        ),
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
-          backgroundColor: AppColors.primary,
+          backgroundColor: isDark ? AppColors.secondary : AppColors.primary,
           foregroundColor: AppColors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(_radius),
@@ -142,9 +219,9 @@ class AppTheme {
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          foregroundColor: AppColors.primary,
-          backgroundColor: AppColors.white,
-          side: const BorderSide(color: AppColors.border),
+          foregroundColor: scheme.onSurface,
+          backgroundColor: card,
+          side: BorderSide(color: scheme.outline),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(_radius),
           ),
@@ -155,33 +232,19 @@ class AppTheme {
           foregroundColor: AppColors.secondary,
         ),
       ),
+      dropdownMenuTheme: DropdownMenuThemeData(
+        textStyle: TextStyle(color: scheme.onSurface),
+      ),
     );
   }
 
-  static ThemeData get darkTheme {
-    const scheme = ColorScheme(
-      brightness: Brightness.dark,
-      primary: AppColors.white,
-      onPrimary: AppColors.primary,
-      primaryContainer: Color(0xFF243B53),
-      onPrimaryContainer: AppColors.white,
-      secondary: AppColors.secondary,
-      onSecondary: AppColors.white,
-      surface: AppColors.darkBackground,
-      onSurface: AppColors.white,
-      onSurfaceVariant: Color(0xFF94A3B8),
-      outline: Color(0xFF334155),
-      outlineVariant: Color(0xFF1E293B),
-      error: AppColors.error,
-      onError: AppColors.white,
-    );
-
-    return ThemeData(
-      useMaterial3: true,
-      brightness: Brightness.dark,
-      colorScheme: scheme,
-      scaffoldBackgroundColor: AppColors.darkBackground,
-      appBarTheme: const AppBarTheme(centerTitle: false, elevation: 0),
-    );
-  }
+  /// Status bar icon màu phù hợp sáng/tối.
+  static SystemUiOverlayStyle overlayStyle(Brightness brightness) =>
+      brightness == Brightness.dark
+          ? SystemUiOverlayStyle.light.copyWith(
+              statusBarColor: Colors.transparent,
+            )
+          : SystemUiOverlayStyle.dark.copyWith(
+              statusBarColor: Colors.transparent,
+            );
 }

@@ -4,8 +4,10 @@ import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../config/app_config.dart';
+import '../constants/app_constants.dart';
 import '../network/api_client.dart';
 import '../network/network_info.dart';
+import '../../features/profile/di/profile_di.dart';
 import '../../features/publication/di/publication_di.dart';
 
 /// Service locator toàn cục.
@@ -27,14 +29,19 @@ Future<void> configureDependencies() async {
   );
   getIt.registerLazySingleton<ApiClient>(() {
     final client = ApiClient(getIt<Dio>());
-    // Nạp credential mặc định từ .env (user có thể override trong Settings).
+    final prefs = getIt<SharedPreferences>();
+    final apiKey = prefs.getString(AppConstants.prefApiKey) ??
+        AppConfig.defaultApiKey;
+    final mailto =
+        prefs.getString(AppConstants.prefMailto) ?? AppConfig.defaultMailto;
     client.setCredentials(
-      apiKey: AppConfig.defaultApiKey,
-      mailto: AppConfig.defaultMailto,
+      apiKey: apiKey.isEmpty ? null : apiKey,
+      mailto: mailto.isEmpty ? null : mailto,
     );
     return client;
   });
 
   // Features
+  initProfileFeature(getIt);
   initPublicationFeature(getIt);
 }

@@ -41,7 +41,7 @@ class JournalFilterBar extends StatelessWidget {
             const SizedBox(width: 8),
             // Chip năm đang chọn, có nút xoá.
             InputChip(
-              label: Text('Năm: $selectedYear'),
+              label: Text('Year: $selectedYear'),
               onDeleted: () => onYearChanged(null),
               deleteIcon: const Icon(Icons.close, size: 16),
               backgroundColor: primary.withValues(alpha: 0.08),
@@ -59,7 +59,7 @@ class JournalFilterBar extends StatelessWidget {
           const SizedBox(width: 8),
           // Menu sắp xếp.
           PopupMenuButton<WorkSortOption>(
-            tooltip: 'Sắp xếp',
+            tooltip: 'Sort',
             splashRadius: 0,
             position: PopupMenuPosition.under,
             onSelected: onSortChanged,
@@ -87,7 +87,7 @@ class JournalFilterBar extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    'Sắp xếp: ${sort.label}',
+                    'Sort: ${sort.label}',
                     style: const TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w500,
@@ -140,7 +140,7 @@ class _FilterButton extends StatelessWidget {
             Icon(Icons.tune, size: 16),
             SizedBox(width: 6),
             Text(
-              'Bộ lọc',
+              'Filters',
               style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
             ),
           ],
@@ -177,7 +177,7 @@ class _YearPickerSheet extends StatelessWidget {
                   Icon(Icons.tune, size: 18, color: cs.primary),
                   const SizedBox(width: 8),
                   Text(
-                    'Lọc theo năm xuất bản',
+                    'Filter by publication year',
                     style:
                         tt.titleSmall?.copyWith(fontWeight: FontWeight.w600),
                   ),
@@ -191,7 +191,7 @@ class _YearPickerSheet extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(vertical: 4),
                 children: [
                   _YearTile(
-                    label: 'Tất cả các năm',
+                    label: 'All years',
                     selected: selectedYear == null,
                     onTap: () => Navigator.pop(context, -1),
                   ),

@@ -26,11 +26,10 @@ class TopicCard extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       elevation: 0,
-      color: Colors.white,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
         side: BorderSide(
-          color: isSelected ? AppColors.navy : AppColors.border,
+          color: isSelected ? cs.primary : cs.outlineVariant,
           width: isSelected ? 1.6 : 1,
         ),
       ),
@@ -55,7 +54,7 @@ class TopicCard extends StatelessWidget {
                             size: 14, color: cs.primary),
                         const SizedBox(width: 4),
                         Text(
-                          'Đang chọn',
+                          'Selected',
                           style: tt.labelSmall?.copyWith(
                             color: cs.primary,
                             fontWeight: FontWeight.w600,
@@ -110,21 +109,21 @@ class TopicCard extends StatelessWidget {
                   _stat(
                     context,
                     icon: Icons.description_outlined,
-                    label: 'Bài báo',
+                    label: 'Papers',
                     value: NumberFormatter.compact(topic.worksCount),
                   ),
                   _stat(
                     context,
                     icon: Icons.format_quote,
-                    label: 'Trích dẫn',
+                    label: 'Citations',
                     value: NumberFormatter.compact(topic.citedByCount),
                   ),
                   _stat(
                     context,
                     icon: Icons.trending_up,
-                    label: 'TB trích dẫn',
+                    label: 'Avg. citations',
                     value: topic.avgCitations.toStringAsFixed(1),
-                    color: AppColors.navy,
+                    color: cs.primary,
                   ),
                 ],
               ),
@@ -158,14 +157,14 @@ class TopicCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: AppColors.surfaceMuted,
+        color: cs.primaryContainer,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
         k,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 11,
-          color: AppColors.navy,
+          color: cs.onPrimaryContainer,
           fontWeight: FontWeight.w500,
         ),
       ),

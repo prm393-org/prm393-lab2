@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/app_colors.dart';
+
 /// Ô tìm kiếm topic kèm dropdown gợi ý các chủ đề mẫu.
 ///
 /// Bấm vào ô → hiện danh sách mẫu; gõ chữ → lọc dần; chọn hoặc Enter để tìm.
@@ -10,7 +12,7 @@ class SearchBarWidget extends StatelessWidget {
   const SearchBarWidget({
     super.key,
     required this.onSearch,
-    this.hintText = 'Tìm chủ đề (vd: fusion, machine learning)…',
+    this.hintText = 'Search topics (e.g. fusion, machine learning)…',
   });
 
   /// Các chủ đề mẫu (display_name khớp với OpenAlex topics).
@@ -52,6 +54,11 @@ class SearchBarWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final fillColor =
+        isDark ? AppColors.darkSurfaceMuted : const Color(0xFFE2E8F0);
+    final borderColor =
+        isDark ? AppColors.darkBorder : const Color(0xFFCBD5E1);
 
     return Autocomplete<String>(
       optionsBuilder: (TextEditingValue value) =>
@@ -93,14 +100,18 @@ class SearchBarWidget extends StatelessWidget {
                     ),
             ),
             filled: true,
-            fillColor: cs.surface,
+            fillColor: fillColor,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
-              borderSide: BorderSide(color: cs.outlineVariant),
+              borderSide: BorderSide(color: borderColor),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
-              borderSide: BorderSide(color: cs.outlineVariant),
+              borderSide: BorderSide(color: borderColor),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(14),
+              borderSide: BorderSide(color: cs.primary, width: 1.5),
             ),
             contentPadding: const EdgeInsets.symmetric(vertical: 12),
           ),

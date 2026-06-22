@@ -75,7 +75,7 @@ class WorkCard extends StatelessWidget {
                       size: 14, color: cs.onSurfaceVariant),
                   const SizedBox(width: 4),
                   Text(
-                    '${NumberFormatter.compact(work.citedByCount)} trích dẫn',
+                    '${NumberFormatter.compact(work.citedByCount)} citations',
                     style:
                         tt.labelSmall?.copyWith(color: cs.onSurfaceVariant),
                   ),

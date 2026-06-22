@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/di/injection.dart';
-import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/error_state_widget.dart';
 import '../../../../core/widgets/loading_widget.dart';
 import '../../../publication/domain/entities/topic.dart';
@@ -45,7 +44,7 @@ class _HomeView extends StatelessWidget {
         return CustomScrollView(
           physics: const ClampingScrollPhysics(),
           slivers: [
-            _buildAppBar(),
+            _buildAppBar(context),
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
@@ -66,7 +65,10 @@ class _HomeView extends StatelessWidget {
     );
   }
 
-  SliverAppBar _buildAppBar() {
+  SliverAppBar _buildAppBar(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final tt = Theme.of(context).textTheme;
+
     return SliverAppBar(
       pinned: true,
       stretch: false,
@@ -74,31 +76,30 @@ class _HomeView extends StatelessWidget {
       snap: false,
       toolbarHeight: 72,
       automaticallyImplyLeading: false,
-      backgroundColor: AppColors.white,
-      foregroundColor: AppColors.navy,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      foregroundColor: cs.onSurface,
       surfaceTintColor: Colors.transparent,
       scrolledUnderElevation: 0,
       elevation: 0,
       titleSpacing: 16,
       centerTitle: false,
-      title: const Column(
+      title: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            'Khám phá chủ đề',
-            style: TextStyle(
-              color: AppColors.navy,
+            'Explore Topics',
+            style: tt.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
               fontSize: 20,
               height: 1.2,
             ),
           ),
-          SizedBox(height: 2),
+          const SizedBox(height: 2),
           Text(
             'Explore research topics',
-            style: TextStyle(
-              color: AppColors.textMuted,
+            style: tt.bodySmall?.copyWith(
+              color: cs.onSurfaceVariant,
               fontWeight: FontWeight.w400,
               fontSize: 12,
               height: 1.2,
@@ -118,7 +119,7 @@ class _HomeView extends StatelessWidget {
     if (state is HomeLoading) {
       return [
         const SliverFillRemaining(
-          child: LoadingWidget(message: 'Đang tải chủ đề…'),
+          child: LoadingWidget(message: 'Loading topics…'),
         ),
       ];
     }
@@ -144,8 +145,8 @@ class _HomeView extends StatelessWidget {
                   const SizedBox(height: 12),
                   Text(
                     state.query != null
-                        ? 'Không tìm thấy chủ đề cho "${state.query}"'
-                        : 'Không có chủ đề nào.',
+                        ? 'No topics found for "${state.query}"'
+                        : 'No topics available.',
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.bodyMedium,
                   ),
@@ -169,8 +170,8 @@ class _HomeView extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
             child: Text(
               byField
-                  ? 'Chủ đề theo lĩnh vực'
-                  : '${state.topics.length} / ${state.total} chủ đề',
+                  ? 'Topics by field'
+                  : '${state.topics.length} / ${state.total} topics',
               style: Theme.of(
                 context,
               ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
@@ -223,7 +224,7 @@ class _HomeView extends StatelessWidget {
         padding: EdgeInsets.fromLTRB(16, 16, 16, 28),
         child: Center(
           child: Text(
-            '— Đã hết chủ đề —',
+            '— End of topics —',
             style: TextStyle(fontSize: 12, color: Colors.grey),
           ),
         ),
@@ -239,7 +240,7 @@ class _HomeView extends StatelessWidget {
     final groups = <String, List<Topic>>{};
     for (final t in topics) {
       groups
-          .putIfAbsent(t.fieldName ?? t.domainName ?? 'Khác', () => [])
+          .putIfAbsent(t.fieldName ?? t.domainName ?? 'Other', () => [])
           .add(t);
     }
     final entries = groups.entries.toList()

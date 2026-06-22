@@ -22,7 +22,7 @@ class ErrorStateWidget extends StatelessWidget {
               FilledButton.icon(
                 onPressed: onRetry,
                 icon: const Icon(Icons.refresh),
-                label: const Text('Thử lại'),
+                label: const Text('Retry'),
               ),
             ],
           ],

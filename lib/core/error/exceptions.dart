@@ -9,15 +9,15 @@ class ServerException implements Exception {
 
 class NetworkException implements Exception {
   final String message;
-  const NetworkException([this.message = 'Không có kết nối mạng']);
+  const NetworkException([this.message = 'No network connection']);
 }
 
 class CacheException implements Exception {
   final String message;
-  const CacheException([this.message = 'Lỗi đọc/ghi dữ liệu cục bộ']);
+  const CacheException([this.message = 'Local read/write error']);
 }
 
 class ParsingException implements Exception {
   final String message;
-  const ParsingException([this.message = 'Dữ liệu trả về không hợp lệ']);
+  const ParsingException([this.message = 'Invalid response data']);
 }

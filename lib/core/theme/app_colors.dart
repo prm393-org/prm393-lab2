@@ -38,6 +38,11 @@ class AppColors {
 
   static const Color lightBackground = surface;
   static const Color darkBackground = Color(0xFF0F172A);
+  static const Color darkSurfaceElevated = Color(0xFF1E293B);
+  static const Color darkSurfaceMuted = Color(0xFF243B53);
+  static const Color darkBorder = Color(0xFF334155);
+  static const Color darkOnSurface = Color(0xFFF1F5F9);
+  static const Color darkPrimaryAccent = Color(0xFF93B4D9);
 
   /// Nền icon / track cho từng accent (design system).
   static Color accentSurface(Color accent) {
