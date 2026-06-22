@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/app_colors.dart';
 import '../../domain/entities/research_dashboard_summary.dart';
 
 class ResearchDashboardRankingCard extends StatelessWidget {
@@ -44,7 +45,7 @@ class ResearchDashboardRankingCard extends StatelessWidget {
                   width: 36,
                   height: 36,
                   decoration: BoxDecoration(
-                    color: accent.withValues(alpha: 0.12),
+                    color: AppColors.accentSurface(accent),
                     borderRadius: BorderRadius.circular(11),
                   ),
                   child: Icon(icon, size: 19, color: accent),
@@ -153,7 +154,7 @@ class _RankingRow extends StatelessWidget {
               minHeight: 7,
               value: progress,
               color: accent,
-              backgroundColor: accent.withValues(alpha: 0.1),
+              backgroundColor: AppColors.accentSurface(accent),
             ),
           ),
         ),

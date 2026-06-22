@@ -33,17 +33,29 @@ class SearchBarWidget extends StatelessWidget {
     'Nanotechnology',
   ];
 
+  /// Gợi ý local khớp với chuỗi đang gõ.
+  static Iterable<String> _matchingSuggestions(String input) {
+    final q = input.trim().toLowerCase();
+    if (q.isEmpty) return sampleTopics;
+    return sampleTopics.where((t) => t.toLowerCase().contains(q));
+  }
+
+  /// Enter: ưu tiên gợi ý đầu (khớp ô hiển thị), không thì dùng chuỗi gõ.
+  static String _resolveQuery(String input) {
+    final trimmed = input.trim();
+    if (trimmed.isEmpty) return '';
+    final matches = _matchingSuggestions(trimmed).toList();
+    if (matches.isNotEmpty) return matches.first;
+    return trimmed;
+  }
+
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
 
     return Autocomplete<String>(
-      optionsBuilder: (TextEditingValue value) {
-        final q = value.text.trim().toLowerCase();
-        if (q.isEmpty) return sampleTopics;
-        return sampleTopics
-            .where((t) => t.toLowerCase().contains(q));
-      },
+      optionsBuilder: (TextEditingValue value) =>
+          _matchingSuggestions(value.text),
       onSelected: (value) {
         FocusManager.instance.primaryFocus?.unfocus();
         onSearch(value);
@@ -55,8 +67,14 @@ class SearchBarWidget extends StatelessWidget {
           focusNode: focusNode,
           onSubmitted: (v) {
             focusNode.unfocus();
-            onFieldSubmitted();
-            onSearch(v);
+            final query = SearchBarWidget._resolveQuery(v);
+            if (controller.text != query) {
+              controller.value = TextEditingValue(
+                text: query,
+                selection: TextSelection.collapsed(offset: query.length),
+              );
+            }
+            onSearch(query);
           },
           textInputAction: TextInputAction.search,
           decoration: InputDecoration(

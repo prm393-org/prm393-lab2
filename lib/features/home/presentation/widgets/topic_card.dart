@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/app_colors.dart';
 import '../../../../core/utils/number_formatter.dart';
 import '../../../publication/domain/entities/topic.dart';
-import 'domain_palette.dart';
 
 /// Thẻ topic: domain/field, display_name, description, keywords,
 /// works_count, cited_by_count và trung bình trích dẫn.
@@ -22,15 +22,15 @@ class TopicCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final tt = Theme.of(context).textTheme;
-    final accent = DomainPalette.of(topic.domainName);
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       elevation: 0,
+      color: Colors.white,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
         side: BorderSide(
-          color: isSelected ? cs.primary : cs.outlineVariant,
+          color: isSelected ? AppColors.navy : AppColors.border,
           width: isSelected ? 1.6 : 1,
         ),
       ),
@@ -45,7 +45,7 @@ class TopicCard extends StatelessWidget {
               Row(
                 children: [
                   if (topic.domainName != null)
-                    _badge(topic.domainName!.toUpperCase(), accent),
+                    _badge(topic.domainName!),
                   const Spacer(),
                   if (isSelected)
                     Row(
@@ -124,7 +124,7 @@ class TopicCard extends StatelessWidget {
                     icon: Icons.trending_up,
                     label: 'TB trích dẫn',
                     value: topic.avgCitations.toStringAsFixed(1),
-                    color: accent,
+                    color: AppColors.navy,
                   ),
                 ],
               ),
@@ -135,20 +135,20 @@ class TopicCard extends StatelessWidget {
     );
   }
 
-  Widget _badge(String text, Color color) {
+  Widget _badge(String text) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(6),
+        color: AppColors.accentMintBg,
+        borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
-        text,
-        style: TextStyle(
+        text.toUpperCase(),
+        style: const TextStyle(
           fontSize: 9.5,
           fontWeight: FontWeight.w700,
-          letterSpacing: 0.5,
-          color: color,
+          letterSpacing: 0.4,
+          color: AppColors.accentMintText,
         ),
       ),
     );
@@ -158,12 +158,16 @@ class TopicCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: cs.surfaceContainerHighest,
+        color: AppColors.surfaceMuted,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
         k,
-        style: TextStyle(fontSize: 11, color: cs.onSurfaceVariant),
+        style: const TextStyle(
+          fontSize: 11,
+          color: AppColors.navy,
+          fontWeight: FontWeight.w500,
+        ),
       ),
     );
   }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/app_colors.dart';
 import '../cubit/home_state.dart';
 
 /// Hàng chip lọc topic: Phổ biến / Ảnh hưởng / Chất lượng / Theo lĩnh vực.
@@ -29,16 +30,16 @@ class TopicFilterBar extends StatelessWidget {
             label: Text(f.label),
             selected: isSel,
             onSelected: (_) => onChanged(f),
+            backgroundColor: AppColors.surfaceMuted,
+            selectedColor: AppColors.navy,
             labelStyle: TextStyle(
               fontSize: 13,
-              fontWeight: isSel ? FontWeight.w600 : FontWeight.w400,
-              color: isSel
-                  ? Theme.of(context).colorScheme.onPrimary
-                  : Theme.of(context).colorScheme.onSurface,
+              fontWeight: isSel ? FontWeight.w600 : FontWeight.w500,
+              color: isSel ? AppColors.white : AppColors.navy,
             ),
-            selectedColor: Theme.of(context).colorScheme.primary,
             showCheckmark: false,
             visualDensity: VisualDensity.compact,
+            side: BorderSide.none,
           );
         },
       ),

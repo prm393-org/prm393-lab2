@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/di/injection.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../../../core/utils/number_formatter.dart';
 import '../../../../core/widgets/error_state_widget.dart';
 import '../../../../core/widgets/loading_widget.dart';
@@ -16,17 +17,14 @@ class PublicationDetailPage extends StatelessWidget {
   final String workId;
   final Work? preview;
 
-  const PublicationDetailPage({
-    super.key,
-    required this.workId,
-    this.preview,
-  });
+  const PublicationDetailPage({super.key, required this.workId, this.preview});
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => getIt<PublicationDetailCubit>()
-        ..load(workId: workId, preview: preview),
+      create: (_) =>
+          getIt<PublicationDetailCubit>()
+            ..load(workId: workId, preview: preview),
       child: const _PublicationDetailView(),
     );
   }
@@ -72,24 +70,26 @@ class _PublicationDetailView extends StatelessWidget {
             ],
           ),
           body: switch (state) {
-            PublicationDetailInitial() =>
-              const LoadingWidget(message: 'Loading publication…'),
-            PublicationDetailLoading() when work == null =>
-              const LoadingWidget(message: 'Loading publication…'),
+            PublicationDetailInitial() => const LoadingWidget(
+              message: 'Loading publication…',
+            ),
+            PublicationDetailLoading() when work == null => const LoadingWidget(
+              message: 'Loading publication…',
+            ),
             PublicationDetailLoading() => Stack(
-                children: [
-                  if (work != null) _DetailBody(work: work, isRefreshing: true),
-                  const Align(
-                    alignment: Alignment.topCenter,
-                    child: LinearProgressIndicator(minHeight: 2),
-                  ),
-                ],
-              ),
+              children: [
+                if (work != null) _DetailBody(work: work, isRefreshing: true),
+                const Align(
+                  alignment: Alignment.topCenter,
+                  child: LinearProgressIndicator(minHeight: 2),
+                ),
+              ],
+            ),
             PublicationDetailLoaded s => _DetailBody(work: s.work),
             PublicationDetailError s => ErrorStateWidget(
-                message: s.message,
-                onRetry: context.read<PublicationDetailCubit>().retry,
-              ),
+              message: s.message,
+              onRetry: context.read<PublicationDetailCubit>().retry,
+            ),
           },
         );
       },
@@ -135,7 +135,9 @@ class _DetailBody extends StatelessWidget {
                 if (work.authors.isNotEmpty) ...[
                   _SectionLabel(label: 'Authors', cs: cs),
                   const SizedBox(height: 8),
-                  ...work.authors.map((a) => _AuthorTile(author: a, cs: cs, tt: tt)),
+                  ...work.authors.map(
+                    (a) => _AuthorTile(author: a, cs: cs, tt: tt),
+                  ),
                   const SizedBox(height: 16),
                 ],
                 _MetaSection(work: work, cs: cs, tt: tt),
@@ -177,8 +179,7 @@ class _DetailBody extends StatelessWidget {
                             padding: EdgeInsets.zero,
                             materialTapTargetSize:
                                 MaterialTapTargetSize.shrinkWrap,
-                            backgroundColor:
-                                cs.surfaceContainerHighest,
+                            backgroundColor: cs.surfaceContainerHighest,
                           ),
                         )
                         .toList(),
@@ -188,12 +189,7 @@ class _DetailBody extends StatelessWidget {
                   const SizedBox(height: 24),
                   _SectionLabel(label: 'Primary Topic', cs: cs),
                   const SizedBox(height: 8),
-                  _tagChip(
-                    Icons.label_outline,
-                    work.primaryTopicName!,
-                    cs,
-                    tt,
-                  ),
+                  _tagChip(Icons.label_outline, work.primaryTopicName!, cs, tt),
                 ],
                 const SizedBox(height: 24),
                 const Divider(),
@@ -213,12 +209,7 @@ class _DetailBody extends StatelessWidget {
     );
   }
 
-  Widget _tagChip(
-    IconData icon,
-    String label,
-    ColorScheme cs,
-    TextTheme tt,
-  ) {
+  Widget _tagChip(IconData icon, String label, ColorScheme cs, TextTheme tt) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
@@ -247,11 +238,7 @@ class _AuthorTile extends StatelessWidget {
   final ColorScheme cs;
   final TextTheme tt;
 
-  const _AuthorTile({
-    required this.author,
-    required this.cs,
-    required this.tt,
-  });
+  const _AuthorTile({required this.author, required this.cs, required this.tt});
 
   Future<void> _openOrcid() async {
     final orcid = author.orcid;
@@ -327,76 +314,81 @@ class _MetaSection extends StatelessWidget {
   final ColorScheme cs;
   final TextTheme tt;
 
-  const _MetaSection({
-    required this.work,
-    required this.cs,
-    required this.tt,
-  });
+  const _MetaSection({required this.work, required this.cs, required this.tt});
 
   @override
   Widget build(BuildContext context) {
     final tags = <Widget>[];
 
     if (work.publicationYear != null) {
-      tags.add(_MetaTag(
-        icon: Icons.calendar_today_outlined,
-        label: work.publicationYear.toString(),
-        cs: cs,
-        tt: tt,
-      ));
+      tags.add(
+        _MetaTag(
+          icon: Icons.calendar_today_outlined,
+          label: work.publicationYear.toString(),
+          cs: cs,
+          tt: tt,
+        ),
+      );
     }
 
     final formattedDate = _formatDate(work.publicationDate);
     if (formattedDate != null) {
-      tags.add(_MetaTag(
-        icon: Icons.event_outlined,
-        label: formattedDate,
-        cs: cs,
-        tt: tt,
-      ));
+      tags.add(
+        _MetaTag(
+          icon: Icons.event_outlined,
+          label: formattedDate,
+          cs: cs,
+          tt: tt,
+        ),
+      );
     }
 
     if (work.type != null) {
-      tags.add(_MetaTag(
-        icon: Icons.article_outlined,
-        label: _formatType(work.type!),
-        cs: cs,
-        tt: tt,
-      ));
+      tags.add(
+        _MetaTag(
+          icon: Icons.article_outlined,
+          label: _formatType(work.type!),
+          cs: cs,
+          tt: tt,
+        ),
+      );
     }
 
     if (work.sourceName != null) {
-      tags.add(_MetaTag(
-        icon: Icons.library_books_outlined,
-        label: work.sourceName!,
-        cs: cs,
-        tt: tt,
-      ));
+      tags.add(
+        _MetaTag(
+          icon: Icons.library_books_outlined,
+          label: work.sourceName!,
+          cs: cs,
+          tt: tt,
+        ),
+      );
     }
 
     if (work.issn != null) {
-      tags.add(_MetaTag(
-        icon: Icons.numbers,
-        label: 'ISSN ${work.issn}',
-        cs: cs,
-        tt: tt,
-      ));
+      tags.add(
+        _MetaTag(
+          icon: Icons.numbers,
+          label: 'ISSN ${work.issn}',
+          cs: cs,
+          tt: tt,
+        ),
+      );
     }
 
     if (work.biblioLabel != null) {
-      tags.add(_MetaTag(
-        icon: Icons.menu_book_outlined,
-        label: work.biblioLabel!,
-        cs: cs,
-        tt: tt,
-      ));
+      tags.add(
+        _MetaTag(
+          icon: Icons.menu_book_outlined,
+          label: work.biblioLabel!,
+          cs: cs,
+          tt: tt,
+        ),
+      );
     }
 
     if (work.isOpenAccess) {
-      tags.add(_OaBadge(
-        oaStatus: work.oaStatus,
-        license: work.license,
-      ));
+      tags.add(_OaBadge(oaStatus: work.oaStatus, license: work.license));
     }
 
     if (tags.isEmpty) return const SizedBox.shrink();
@@ -411,8 +403,14 @@ class _MetaSection extends StatelessWidget {
     return DateFormat.yMMMd().format(parsed);
   }
 
-  String _formatType(String type) =>
-      type.split('-').map((part) => part.isEmpty ? part : '${part[0].toUpperCase()}${part.substring(1)}').join(' ');
+  String _formatType(String type) => type
+      .split('-')
+      .map(
+        (part) => part.isEmpty
+            ? part
+            : '${part[0].toUpperCase()}${part.substring(1)}',
+      )
+      .join(' ');
 }
 
 class _MetaTag extends StatelessWidget {
@@ -471,23 +469,23 @@ class _OaBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: const Color(0xFF16A34A).withValues(alpha: 0.1),
+        color: AppColors.accentTealBg,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: const Color(0xFF16A34A).withValues(alpha: 0.3),
+          color: AppColors.tertiary.withValues(alpha: 0.35),
         ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.lock_open, size: 12, color: Color(0xFF16A34A)),
+          const Icon(Icons.lock_open, size: 12, color: AppColors.accentTealDark),
           const SizedBox(width: 4),
           Text(
             license != null ? '$statusLabel · $license' : statusLabel,
             style: const TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w600,
-              color: Color(0xFF16A34A),
+              color: AppColors.accentTealDark,
             ),
           ),
         ],

@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/di/injection.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../../../core/router/work_detail_navigation.dart';
 import '../../../../core/widgets/error_state_widget.dart';
 import '../../../../core/widgets/loading_widget.dart';
@@ -64,68 +65,68 @@ class _JournalView extends StatelessWidget {
     };
 
     return SliverAppBar(
-      expandedHeight: topic != null ? 130 : 90,
-      collapsedHeight: kToolbarHeight,
       pinned: true,
       stretch: false,
-      backgroundColor: const Color(0xFF1D4ED8),
+      floating: false,
+      snap: false,
+      toolbarHeight: topic != null && topic.fieldName != null ? 72 : 64,
+      automaticallyImplyLeading: false,
+      backgroundColor: AppColors.white,
+      foregroundColor: AppColors.navy,
       surfaceTintColor: Colors.transparent,
       scrolledUnderElevation: 0,
       elevation: 0,
+      titleSpacing: 16,
+      centerTitle: false,
       actions: [
         if (state is JournalLoaded)
           IconButton(
-            icon: const Icon(Icons.refresh, color: Colors.white),
+            icon: const Icon(Icons.refresh, color: AppColors.navy),
             tooltip: 'Tải lại',
             onPressed: () =>
                 context.read<JournalCubit>().loadByTopic(state.topic),
           ),
       ],
-      flexibleSpace: FlexibleSpaceBar(
-        titlePadding: const EdgeInsets.only(left: 16, bottom: 14, right: 56),
-        title: topic != null
-            ? Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
+      title: topic != null
+          ? Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  topic.displayName,
+                  style: const TextStyle(
+                    color: AppColors.navy,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    height: 1.2,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                if (topic.fieldName != null) ...[
+                  const SizedBox(height: 2),
                   Text(
-                    topic.displayName,
+                    topic.fieldName!,
                     style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
+                      color: AppColors.textMuted,
+                      fontSize: 11,
+                      height: 1.2,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  if (topic.fieldName != null)
-                    Text(
-                      topic.fieldName!,
-                      style: const TextStyle(
-                        color: Colors.white70,
-                        fontSize: 11,
-                      ),
-                    ),
                 ],
-              )
-            : const Text(
-                'Bài báo',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20,
-                ),
+              ],
+            )
+          : const Text(
+              'Bài báo',
+              style: TextStyle(
+                color: AppColors.navy,
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+                height: 1.2,
               ),
-        background: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Color(0xFF6D28D9), Color(0xFF1D4ED8)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
             ),
-          ),
-        ),
-      ),
     );
   }
 
@@ -142,13 +143,13 @@ class _JournalView extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF7C3AED).withValues(alpha: 0.1),
+                    color: AppColors.surfaceMuted,
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
                     Icons.touch_app_outlined,
                     size: 48,
-                    color: Color(0xFF7C3AED),
+                    color: AppColors.navy,
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -174,7 +175,7 @@ class _JournalView extends StatelessWidget {
                   icon: const Icon(Icons.search),
                   label: const Text('Tìm chủ đề'),
                   style: FilledButton.styleFrom(
-                    backgroundColor: const Color(0xFF7C3AED),
+                    backgroundColor: AppColors.navy,
                   ),
                 ),
               ],

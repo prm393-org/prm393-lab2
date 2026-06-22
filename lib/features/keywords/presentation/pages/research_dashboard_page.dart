@@ -159,7 +159,7 @@ class _ResearchDashboardView extends StatelessWidget {
               subtitle: 'By contributing papers in the sample',
               icon: Icons.groups_outlined,
               items: summary.topAuthors,
-              accent: AppColors.secondary,
+              accent: AppColors.tertiary,
             ),
           ),
         ],

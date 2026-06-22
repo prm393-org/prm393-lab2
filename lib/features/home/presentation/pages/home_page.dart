@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/di/injection.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/error_state_widget.dart';
 import '../../../../core/widgets/loading_widget.dart';
 import '../../../publication/domain/entities/topic.dart';
@@ -42,6 +43,7 @@ class _HomeView extends StatelessWidget {
     return BlocBuilder<HomeCubit, HomeState>(
       builder: (context, state) {
         return CustomScrollView(
+          physics: const ClampingScrollPhysics(),
           slivers: [
             _buildAppBar(),
             SliverToBoxAdapter(
@@ -66,37 +68,43 @@ class _HomeView extends StatelessWidget {
 
   SliverAppBar _buildAppBar() {
     return SliverAppBar(
-      expandedHeight: 120,
       pinned: true,
-      backgroundColor: const Color(0xFF1D4ED8), // xanh dương đậm
+      stretch: false,
+      floating: false,
+      snap: false,
+      toolbarHeight: 72,
+      automaticallyImplyLeading: false,
+      backgroundColor: AppColors.white,
+      foregroundColor: AppColors.navy,
       surfaceTintColor: Colors.transparent,
       scrolledUnderElevation: 0,
       elevation: 0,
-      flexibleSpace: FlexibleSpaceBar(
-        titlePadding: const EdgeInsets.only(left: 16, bottom: 14),
-        title: const Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Khám phá chủ đề',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-              ),
-            ),
-          ],
-        ),
-        background: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Color(0xFF1D4ED8), Color(0xFF7C3AED)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+      titleSpacing: 16,
+      centerTitle: false,
+      title: const Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            'Khám phá chủ đề',
+            style: TextStyle(
+              color: AppColors.navy,
+              fontWeight: FontWeight.bold,
+              fontSize: 20,
+              height: 1.2,
             ),
           ),
-        ),
+          SizedBox(height: 2),
+          Text(
+            'Explore research topics',
+            style: TextStyle(
+              color: AppColors.textMuted,
+              fontWeight: FontWeight.w400,
+              fontSize: 12,
+              height: 1.2,
+            ),
+          ),
+        ],
       ),
     );
   }

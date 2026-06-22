@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/app_colors.dart';
 import '../../../../core/utils/number_formatter.dart';
 import '../../../publication/domain/entities/work.dart';
 
@@ -36,9 +37,9 @@ class JournalCard extends StatelessWidget {
             children: [
               Container(
                 width: 4,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF7C3AED),
-                  borderRadius: const BorderRadius.only(
+                decoration: const BoxDecoration(
+                  color: AppColors.navy,
+                  borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(12),
                     bottomLeft: Radius.circular(12),
                   ),
@@ -130,7 +131,7 @@ class _OaTag extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
-        color: const Color(0xFF16A34A).withValues(alpha: 0.1),
+        color: AppColors.accentTealBg,
         borderRadius: BorderRadius.circular(4),
       ),
       child: const Text(
@@ -138,7 +139,7 @@ class _OaTag extends StatelessWidget {
         style: TextStyle(
           fontSize: 10,
           fontWeight: FontWeight.bold,
-          color: Color(0xFF16A34A),
+          color: AppColors.accentTealDark,
         ),
       ),
     );

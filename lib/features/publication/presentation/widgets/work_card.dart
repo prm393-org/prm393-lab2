@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/app_colors.dart';
 import '../../../../core/router/work_detail_navigation.dart';
 import '../../../../core/utils/number_formatter.dart';
 import '../../domain/entities/work.dart';
@@ -84,8 +85,7 @@ class WorkCard extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(
-                        color:
-                            const Color(0xFF16A34A).withValues(alpha: 0.1),
+                        color: AppColors.accentTealBg,
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: const Text(
@@ -93,7 +93,7 @@ class WorkCard extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF16A34A),
+                          color: AppColors.accentTealDark,
                         ),
                       ),
                     ),
