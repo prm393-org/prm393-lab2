@@ -45,17 +45,14 @@ class _PublicationDetailView extends StatelessWidget {
         };
 
         return Scaffold(
-          backgroundColor: Colors.white,
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           appBar: AppBar(
             title: const Text(
               'Publication Details',
-              style: TextStyle(
-                color: Colors.black,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontWeight: FontWeight.bold),
             ),
-            backgroundColor: Colors.white,
-            foregroundColor: Colors.black,
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+            foregroundColor: Theme.of(context).colorScheme.onSurface,
             elevation: 0,
             scrolledUnderElevation: 0,
             surfaceTintColor: Colors.transparent,
@@ -128,7 +125,6 @@ class _DetailBody extends StatelessWidget {
                   style: tt.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
                     height: 1.3,
-                    color: Colors.black,
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -151,10 +147,7 @@ class _DetailBody extends StatelessWidget {
                 if (work.abstract_ != null && work.abstract_!.isNotEmpty)
                   SelectableText(
                     work.abstract_!,
-                    style: tt.bodyMedium?.copyWith(
-                      height: 1.6,
-                      color: Colors.black87,
-                    ),
+                    style: tt.bodyMedium?.copyWith(height: 1.6),
                   )
                 else
                   Text(

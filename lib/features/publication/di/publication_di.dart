@@ -7,6 +7,7 @@ import '../../journal/presentation/cubit/journal_cubit.dart';
 import '../../journal/presentation/cubit/publication_detail_cubit.dart';
 import '../../keywords/domain/usecases/build_research_dashboard.dart';
 import '../../keywords/presentation/cubit/research_dashboard_cubit.dart';
+import '../../shared/presentation/cubit/pending_search_cubit.dart';
 import '../../shared/presentation/cubit/selected_topic_cubit.dart';
 import '../data/datasources/publication_remote_datasource.dart';
 import '../data/repositories/publication_repository_impl.dart';
@@ -39,6 +40,7 @@ void initPublicationFeature(GetIt sl) {
 
   // Shared state (singleton — cùng instance cho mọi tab)
   sl.registerSingleton<SelectedTopicCubit>(SelectedTopicCubit());
+  sl.registerSingleton<PendingSearchCubit>(PendingSearchCubit());
 
   // Cubits (factory = fresh state mỗi lần tạo tab)
   sl.registerFactory(() => HomeCubit(sl<SearchTopics>()));

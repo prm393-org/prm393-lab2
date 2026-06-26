@@ -3,6 +3,7 @@ import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../core/constants/app_constants.dart';
+import '../../../../core/data/recent_searches_store.dart';
 import '../../../publication/domain/entities/topic.dart';
 import '../../../publication/domain/usecases/search_topics.dart';
 import 'home_state.dart';
@@ -33,6 +34,9 @@ class HomeCubit extends Cubit<HomeState> {
 
   Future<void> search(String query) {
     _query = query.trim().isEmpty ? null : query.trim();
+    if (_query != null && GetIt.I.isRegistered<RecentSearchesStore>()) {
+      GetIt.I<RecentSearchesStore>().add(_query!);
+    }
     return _load(reset: true);
   }
 

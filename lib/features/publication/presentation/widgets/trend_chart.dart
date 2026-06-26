@@ -5,7 +5,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/utils/number_formatter.dart';
 import '../../domain/entities/trend_point.dart';
 
-/// Biểu đồ cột số bài báo theo năm (4.3 — Publication Trend Analysis).
+/// Biểu đồ đường số bài báo theo năm (4.3 — Publication Trend Analysis).
 ///
 /// Hiển thị tối đa [maxYears] năm gần nhất để chart dễ đọc trên mobile.
 class TrendChart extends StatelessWidget {
@@ -107,16 +107,18 @@ class TrendChart extends StatelessWidget {
             const SizedBox(height: 20),
             SizedBox(
               height: 200,
-              child: BarChart(
-                BarChartData(
-                  alignment: BarChartAlignment.spaceBetween,
+              child: LineChart(
+                LineChartData(
+                  minX: 0,
+                  maxX: (points.length - 1).toDouble(),
+                  minY: 0,
                   maxY: maxCount * 1.25,
-                  barTouchData: BarTouchData(
-                    touchTooltipData: BarTouchTooltipData(
+                  lineTouchData: LineTouchData(
+                    touchTooltipData: LineTouchTooltipData(
                       getTooltipColor: (_) => cs.inverseSurface,
-                      getTooltipItem: (group, _, rod, _) {
-                        final p = points[group.x];
-                        return BarTooltipItem(
+                      getTooltipItems: (spots) => spots.map((s) {
+                        final p = points[s.x.toInt()];
+                        return LineTooltipItem(
                           '${p.year}\n',
                           TextStyle(
                             color: cs.onInverseSurface,
@@ -125,17 +127,15 @@ class TrendChart extends StatelessWidget {
                           ),
                           children: [
                             TextSpan(
-                              text:
-                                  '${NumberFormatter.compact(p.count)} papers',
+                              text: '${NumberFormatter.compact(p.count)} papers',
                               style: TextStyle(
-                                color: cs.onInverseSurface
-                                    .withValues(alpha: 0.8),
+                                color: cs.onInverseSurface.withValues(alpha: 0.8),
                                 fontSize: 11,
                               ),
                             ),
                           ],
                         );
-                      },
+                      }).toList(),
                     ),
                   ),
                   titlesData: FlTitlesData(
@@ -159,8 +159,6 @@ class TrendChart extends StatelessWidget {
                           }
                           final last = points.length - 1;
                           final step = points.length > 8 ? 2 : 1;
-                          // Luôn hiện nhãn cuối; các nhãn khác theo bước, nhưng
-                          // bỏ nhãn sát ngay trước nhãn cuối để chữ khỏi chen nhau.
                           final showByStep = i % step == 0 && i != last - 1;
                           if (i != last && !showByStep) {
                             return const SizedBox.shrink();
@@ -179,30 +177,49 @@ class TrendChart extends StatelessWidget {
                       ),
                     ),
                   ),
-                  gridData: const FlGridData(show: false),
+                  gridData: FlGridData(
+                    show: true,
+                    drawVerticalLine: false,
+                    horizontalInterval: maxCount * 1.25 / 4,
+                    getDrawingHorizontalLine: (_) => FlLine(
+                      color: cs.outlineVariant.withValues(alpha: 0.4),
+                      strokeWidth: 1,
+                    ),
+                  ),
                   borderData: FlBorderData(show: false),
-                  barGroups: [
-                    for (var i = 0; i < points.length; i++)
-                      BarChartGroupData(
-                        x: i,
-                        barRods: [
-                          BarChartRodData(
-                            toY: points[i].count.toDouble(),
-                            width: 14,
-                            borderRadius: const BorderRadius.vertical(
-                              top: Radius.circular(4),
-                            ),
-                            gradient: LinearGradient(
-                              begin: Alignment.bottomCenter,
-                              end: Alignment.topCenter,
-                              colors: [
-                                cs.primary.withValues(alpha: 0.5),
-                                cs.primary,
-                              ],
-                            ),
-                          ),
-                        ],
+                  lineBarsData: [
+                    LineChartBarData(
+                      spots: [
+                        for (var i = 0; i < points.length; i++)
+                          FlSpot(i.toDouble(), points[i].count.toDouble()),
+                      ],
+                      isCurved: true,
+                      curveSmoothness: 0.3,
+                      color: trendColor,
+                      barWidth: 2.5,
+                      isStrokeCapRound: true,
+                      dotData: FlDotData(
+                        show: true,
+                        getDotPainter: (spot, _, _, _) =>
+                            FlDotCirclePainter(
+                          radius: 3,
+                          color: trendColor,
+                          strokeWidth: 1.5,
+                          strokeColor: cs.surface,
+                        ),
                       ),
+                      belowBarData: BarAreaData(
+                        show: true,
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            trendColor.withValues(alpha: 0.2),
+                            trendColor.withValues(alpha: 0.0),
+                          ],
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),

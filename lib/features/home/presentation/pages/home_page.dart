@@ -216,7 +216,20 @@ class _HomeView extends StatelessWidget {
     }
     if (state.hasMore) {
       return SliverToBoxAdapter(
-        child: Padding(padding: const EdgeInsets.fromLTRB(16, 12, 16, 28)),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 28),
+          child: Center(
+            child: TextButton.icon(
+              onPressed: cubit.loadMore,
+              icon: const Icon(Icons.expand_more),
+              label: const Text('Load More Results'),
+              style: TextButton.styleFrom(
+                foregroundColor: Theme.of(context).colorScheme.primary,
+                textStyle: const TextStyle(fontWeight: FontWeight.w600),
+              ),
+            ),
+          ),
+        ),
       );
     }
     return const SliverToBoxAdapter(
