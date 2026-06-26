@@ -20,9 +20,9 @@ class MainScaffold extends StatelessWidget {
       label: 'Journal',
     ),
     _NavDestination(
-      icon: Icons.dashboard_outlined,
-      selectedIcon: Icons.dashboard,
-      label: 'Dashboard',
+      icon: Icons.tag_outlined,
+      selectedIcon: Icons.tag,
+      label: 'Keywords',
     ),
     _NavDestination(
       icon: Icons.person_outline,

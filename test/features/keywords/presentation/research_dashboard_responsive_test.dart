@@ -120,4 +120,5 @@ const _summary = ResearchDashboardSummary(
   topJournals: _rankings,
   topAuthors: _rankings,
   topPapers: _papers,
+  scatterPapers: _papers,
 );

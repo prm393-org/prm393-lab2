@@ -26,6 +26,9 @@ class ResearchDashboardSummary extends Equatable {
   final List<RankedResearchItem> topAuthors;
   final List<Work> topPapers;
 
+  /// Bài báo (có năm xuất bản) dùng cho scatter Năm × Citations.
+  final List<Work> scatterPapers;
+
   const ResearchDashboardSummary({
     required this.topic,
     required this.totalPublications,
@@ -37,6 +40,7 @@ class ResearchDashboardSummary extends Equatable {
     required this.topJournals,
     required this.topAuthors,
     required this.topPapers,
+    required this.scatterPapers,
   });
 
   RankedResearchItem? get topJournal =>
@@ -57,5 +61,6 @@ class ResearchDashboardSummary extends Equatable {
     topJournals,
     topAuthors,
     topPapers,
+    scatterPapers,
   ];
 }

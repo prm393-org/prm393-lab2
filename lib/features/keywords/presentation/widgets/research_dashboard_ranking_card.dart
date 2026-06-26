@@ -79,12 +79,11 @@ class ResearchDashboardRankingCard extends StatelessWidget {
             const SizedBox(height: 20),
             for (var index = 0; index < items.length; index++) ...[
               _RankingRow(
-                rank: index + 1,
                 item: items[index],
                 maxCount: maxCount,
                 accent: accent,
               ),
-              if (index != items.length - 1) const SizedBox(height: 16),
+              if (index != items.length - 1) const SizedBox(height: 10),
             ],
           ],
         ),
@@ -94,13 +93,11 @@ class ResearchDashboardRankingCard extends StatelessWidget {
 }
 
 class _RankingRow extends StatelessWidget {
-  final int rank;
   final RankedResearchItem item;
   final int maxCount;
   final Color accent;
 
   const _RankingRow({
-    required this.rank,
     required this.item,
     required this.maxCount,
     required this.accent,
@@ -112,49 +109,38 @@ class _RankingRow extends StatelessWidget {
     final tt = Theme.of(context).textTheme;
     final progress = maxCount == 0 ? 0.0 : item.count / maxCount;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Row(
       children: [
-        Row(
-          children: [
-            SizedBox(
-              width: 24,
-              child: Text(
-                '$rank',
-                style: tt.labelMedium?.copyWith(
-                  color: accent,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-            ),
-            Expanded(
-              child: Text(
-                item.name,
-                style: tt.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            const SizedBox(width: 10),
-            Text(
-              '${item.count}',
-              style: tt.labelMedium?.copyWith(
-                color: cs.onSurfaceVariant,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ],
+        SizedBox(
+          width: 110,
+          child: Text(
+            item.name,
+            style: tt.labelMedium?.copyWith(fontWeight: FontWeight.w600),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
-        const SizedBox(height: 7),
-        Padding(
-          padding: const EdgeInsets.only(left: 24),
+        const SizedBox(width: 8),
+        Expanded(
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(4),
             child: LinearProgressIndicator(
-              minHeight: 7,
+              minHeight: 18,
               value: progress,
               color: accent,
               backgroundColor: AppColors.accentSurface(accent),
+            ),
+          ),
+        ),
+        const SizedBox(width: 8),
+        SizedBox(
+          width: 28,
+          child: Text(
+            '${item.count}',
+            textAlign: TextAlign.right,
+            style: tt.labelSmall?.copyWith(
+              color: cs.onSurfaceVariant,
+              fontWeight: FontWeight.w700,
             ),
           ),
         ),

@@ -16,7 +16,7 @@ import '../cubit/research_dashboard_state.dart';
 import '../widgets/research_dashboard_header.dart';
 import '../widgets/research_dashboard_kpi_grid.dart';
 import '../widgets/research_dashboard_ranking_card.dart';
-import '../widgets/research_dashboard_top_papers.dart';
+import '../widgets/research_dashboard_scatter.dart';
 
 class ResearchDashboardPage extends StatelessWidget {
   const ResearchDashboardPage({super.key});
@@ -53,7 +53,7 @@ class _ResearchDashboardView extends StatelessWidget {
       builder: (context, state) {
         return Scaffold(
           appBar: AppBar(
-            title: const Text('Research Dashboard'),
+            title: const Text('Keywords'),
             backgroundColor: Theme.of(context).colorScheme.surface,
             actions: [
               if (state is ResearchDashboardLoaded ||
@@ -74,9 +74,9 @@ class _ResearchDashboardView extends StatelessWidget {
   Widget _buildBody(BuildContext context, ResearchDashboardState state) {
     if (state is ResearchDashboardInitial) {
       return EmptyStateWidget(
-        icon: Icons.dashboard_customize_outlined,
+        icon: Icons.tag_outlined,
         message:
-            'No research topic is selected.\nChoose a topic from Home to build its dashboard.',
+            'No research topic is selected.\nChoose a topic from Home to explore keywords.',
         action: FilledButton.icon(
           onPressed: () => context.go('/home'),
           icon: const Icon(Icons.search),
@@ -127,42 +127,65 @@ class _ResearchDashboardView extends StatelessWidget {
             child: ResearchDashboardKpiGrid(summary: summary),
           ),
           if (summary.yearlyTrend.length >= 2) ...[
-            const SizedBox(height: 12),
+            _SectionHeader(label: 'Trends'),
             SizedBox(
               width: double.infinity,
               child: TrendChart(trend: summary.yearlyTrend),
             ),
           ],
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: ResearchDashboardTopPapers(
-              papers: summary.topPapers,
-              onPaperTap: (paper) => openWorkDetail(context, paper),
+          if (summary.scatterPapers.length >= 4) ...[
+            _SectionHeader(label: 'Impact'),
+            ResearchDashboardScatter(
+              papers: summary.scatterPapers,
+              onPaperTap: (work) => openWorkDetail(context, work),
             ),
-          ),
-          const SizedBox(height: 16),
+          ],
+          _SectionHeader(label: 'Authors'),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: ResearchDashboardRankingCard(
-              title: 'Top Journals',
-              subtitle: 'By publication frequency in the sample',
-              icon: Icons.library_books_outlined,
-              items: summary.topJournals,
-              accent: AppColors.primary,
-            ),
-          ),
-          const SizedBox(height: 16),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: ResearchDashboardRankingCard(
-              title: 'Top Authors',
+              title: 'Author Impact',
               subtitle: 'By contributing papers in the sample',
               icon: Icons.groups_outlined,
               items: summary.topAuthors,
               accent: AppColors.tertiary,
             ),
           ),
+          _SectionHeader(label: 'Journals'),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: ResearchDashboardRankingCard(
+              title: 'Journal Ranking',
+              subtitle: 'By publication frequency in the sample',
+              icon: Icons.library_books_outlined,
+              items: summary.topJournals,
+              accent: AppColors.primary,
+            ),
+          ),
+          const SizedBox(height: 8),
         ],
+      ),
+    );
+  }
+}
+
+class _SectionHeader extends StatelessWidget {
+  final String label;
+  const _SectionHeader({required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 20, 16, 8),
+      child: Text(
+        label.toUpperCase(),
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 1.2,
+          color: cs.onSurface.withValues(alpha: 0.45),
+        ),
       ),
     );
   }

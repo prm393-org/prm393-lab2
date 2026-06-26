@@ -1,18 +1,14 @@
 import 'dart:math' as math;
 
-import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/utils/number_formatter.dart';
 import '../../../publication/domain/entities/topic.dart';
 import 'domain_palette.dart';
 
-/// Khu vực 3 biểu đồ khám phá topic (chuyển bằng SegmentedButton hoặc vuốt):
-///   1. Top bài báo — Horizontal Bar (works_count + cited_by_count)
-///   2. Tương quan — Bubble (works × citations, cỡ = TB trích dẫn)
-///   3. Tỷ trọng lĩnh vực — thanh tỉ lệ + chú giải
-/// Tap vào biểu đồ để chọn topic. Bố cục thích ứng theo kích thước màn + cỡ chữ.
-class TopicChartsSection extends StatefulWidget {
+/// Khu vực "Research landscape": treemap 2 cấp (domain → topic) khám phá bức
+/// tranh chủ đề. Tap một lĩnh vực để xem topic bên trong, tap topic để chọn.
+class TopicChartsSection extends StatelessWidget {
   final List<Topic> topics;
   final ValueChanged<Topic> onSelect;
 
@@ -23,61 +19,20 @@ class TopicChartsSection extends StatefulWidget {
   });
 
   @override
-  State<TopicChartsSection> createState() => _TopicChartsSectionState();
-}
-
-class _TopicChartsSectionState extends State<TopicChartsSection> {
-  late final PageController _controller;
-  int _page = 0;
-
-  static const _titles = [
-    'Top papers',
-    'Papers × Citations',
-    'Domain share',
-  ];
-  static const _icons = [
-    Icons.bar_chart_rounded,
-    Icons.bubble_chart_outlined,
-    Icons.grid_view_rounded,
-  ];
-
-  @override
-  void initState() {
-    super.initState();
-    // viewportFraction < 1 để lộ mép trang kế tiếp → gợi ý "vuốt được".
-    _controller = PageController(viewportFraction: 0.95);
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  void _goTo(int page) {
-    _controller.animateToPage(
-      page,
-      duration: const Duration(milliseconds: 280),
-      curve: Curves.easeOutCubic,
-    );
-  }
-
-  @override
   Widget build(BuildContext context) {
-    if (widget.topics.isEmpty) return const SizedBox.shrink();
+    if (topics.isEmpty) return const SizedBox.shrink();
     final cs = Theme.of(context).colorScheme;
     final tt = Theme.of(context).textTheme;
 
     final media = MediaQuery.of(context);
     final w = media.size.width;
-    final isWide = w >= 600; // tablet / màn lớn
+    final isWide = w >= 600;
     final isLandscape = media.orientation == Orientation.landscape;
     final textScale = media.textScaler.scale(1).clamp(1.0, 1.5);
-    final showSegmentLabels = w >= 380;
 
     // Chiều cao thích ứng: tablet rộng hơn, landscape thấp hơn, nhân theo cỡ chữ.
-    final base = isWide ? 300.0 : (isLandscape ? 190.0 : 250.0);
-    final chartHeight = (base * textScale).clamp(180.0, 480.0);
+    final base = isWide ? 320.0 : (isLandscape ? 200.0 : 260.0);
+    final chartHeight = (base * textScale).clamp(200.0, 480.0);
 
     return Card(
       margin: const EdgeInsets.fromLTRB(16, 4, 16, 12),
@@ -91,14 +46,13 @@ class _TopicChartsSectionState extends State<TopicChartsSection> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ── Header ──────────────────────────────────────────────────
             Row(
               children: [
-                Icon(_icons[_page], size: 18, color: cs.primary),
+                Icon(Icons.grid_view_rounded, size: 18, color: cs.primary),
                 const SizedBox(width: 6),
                 Expanded(
                   child: Text(
-                    _titles[_page],
+                    'Research landscape',
                     style:
                         tt.titleSmall?.copyWith(fontWeight: FontWeight.w600),
                     maxLines: 1,
@@ -108,91 +62,14 @@ class _TopicChartsSectionState extends State<TopicChartsSection> {
               ],
             ),
             const SizedBox(height: 12),
-
-            // ── Bộ chuyển biểu đồ (discoverability + chọn trực tiếp) ─────
-            Align(
-              alignment: Alignment.center,
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: SegmentedButton<int>(
-                  showSelectedIcon: false,
-                  style: const ButtonStyle(
-                    visualDensity: VisualDensity.compact,
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  ),
-                  segments: [
-                    for (var i = 0; i < 3; i++)
-                      ButtonSegment<int>(
-                        value: i,
-                        icon: Icon(_icons[i], size: 16),
-                        label: showSegmentLabels ? Text(_shortLabel(i)) : null,
-                      ),
-                  ],
-                  selected: {_page},
-                  onSelectionChanged: (s) => _goTo(s.first),
-                ),
-              ),
-            ),
-            const SizedBox(height: 14),
-
-            // ── Vùng biểu đồ (chiều cao thích ứng, không tràn) ───────────
             SizedBox(
               height: chartHeight,
-              child: PageView(
-                controller: _controller,
-                onPageChanged: (i) => setState(() => _page = i),
-                children: [
-                  _ChartPage(
-                    child: _HorizontalBarChart(
-                      topics: widget.topics,
-                      onSelect: widget.onSelect,
-                      isWide: isWide,
-                    ),
-                  ),
-                  _ChartPage(
-                    child: _BubbleChart(
-                      topics: widget.topics,
-                      onSelect: widget.onSelect,
-                      maxPoints: isWide ? 60 : 30,
-                    ),
-                  ),
-                  _ChartPage(
-                    child: _DomainShareChart(
-                      topics: widget.topics,
-                      onSelect: widget.onSelect,
-                    ),
-                  ),
-                ],
-              ),
+              child: _DomainShareChart(topics: topics, onSelect: onSelect),
             ),
-            const SizedBox(height: 10),
-
-            // ── Chỉ báo trang + chú thích tương tác ──────────────────────
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(3, (i) {
-                final active = i == _page;
-                return GestureDetector(
-                  onTap: () => _goTo(i),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    margin: const EdgeInsets.symmetric(horizontal: 3),
-                    width: active ? 18 : 6,
-                    height: 6,
-                    decoration: BoxDecoration(
-                      color: active
-                          ? cs.primary
-                          : cs.onSurface.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(3),
-                    ),
-                  ),
-                );
-              }),
-            ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 8),
             Center(
               child: Text(
-                'Tap a chart to select a topic',
+                'Tap a field to explore its topics',
                 style: tt.labelSmall
                     ?.copyWith(color: cs.onSurface.withValues(alpha: 0.4)),
               ),
@@ -202,382 +79,253 @@ class _TopicChartsSectionState extends State<TopicChartsSection> {
       ),
     );
   }
-
-  String _shortLabel(int i) => switch (i) {
-        0 => 'Top',
-        1 => 'Correlation',
-        _ => 'Domain',
-      };
 }
 
-/// Bọc mỗi trang với chút padding ngang để có khe hở giữa các trang khi peeking.
-class _ChartPage extends StatelessWidget {
-  final Widget child;
-  const _ChartPage({required this.child});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(right: 8),
-      child: child,
-    );
-  }
-}
-
-/// ── Chart 1: Horizontal bar (top theo works_count, kèm cited_by_count) ──
-class _HorizontalBarChart extends StatelessWidget {
-  final List<Topic> topics;
-  final ValueChanged<Topic> onSelect;
-  final bool isWide;
-
-  const _HorizontalBarChart({
-    required this.topics,
-    required this.onSelect,
-    required this.isWide,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final ts = MediaQuery.of(context).textScaler.scale(1).clamp(1.0, 1.5);
-    final sorted = [...topics]
-      ..sort((a, b) => b.worksCount.compareTo(a.worksCount));
-    final maxV = sorted.isEmpty
-        ? 1
-        : sorted.map((t) => t.worksCount).reduce(math.max).clamp(1, 1 << 62);
-
-    // Số dòng vừa khít chiều cao hiện có → không bao giờ tràn dù cỡ chữ lớn.
-    return LayoutBuilder(
-      builder: (context, c) {
-        final perItem = 60.0 * ts;
-        final hardCap = isWide ? 8 : 5;
-        final fit = (c.maxHeight / perItem).floor();
-        final count =
-            fit.clamp(3, hardCap).clamp(1, sorted.length);
-        final items = sorted.take(count).toList();
-
-        return Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            for (var i = 0; i < items.length; i++)
-              _BarRow(
-                rank: i + 1,
-                topic: items[i],
-                maxV: maxV,
-                onTap: () => onSelect(items[i]),
-              ),
-          ],
-        );
-      },
-    );
-  }
-}
-
-class _BarRow extends StatelessWidget {
-  final int rank;
-  final Topic topic;
-  final num maxV;
-  final VoidCallback onTap;
-
-  const _BarRow({
-    required this.rank,
-    required this.topic,
-    required this.maxV,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    final tt = Theme.of(context).textTheme;
-    final color = DomainPalette.of(topic.domainName);
-
-    return Semantics(
-      button: true,
-      label: 'Rank $rank: ${topic.displayName}, '
-          '${topic.worksCount} papers, ${topic.citedByCount} citations',
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(8),
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(minHeight: 48), // touch target
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4),
-            child: Row(
-              children: [
-                _RankBadge(rank: rank),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              topic.displayName,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: tt.bodySmall
-                                  ?.copyWith(fontWeight: FontWeight.w500),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            '${NumberFormatter.compact(topic.worksCount)} papers',
-                            style: tt.labelSmall?.copyWith(
-                              color: cs.primary,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 4),
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(4),
-                        child: LinearProgressIndicator(
-                          value: (topic.worksCount / maxV).clamp(0.0, 1.0),
-                          minHeight: 8,
-                          backgroundColor: cs.surfaceContainerHighest,
-                          valueColor: AlwaysStoppedAnimation(color),
-                        ),
-                      ),
-                      const SizedBox(height: 3),
-                      Row(
-                        children: [
-                          Icon(Icons.format_quote,
-                              size: 11,
-                              color: cs.onSurface.withValues(alpha: 0.45)),
-                          const SizedBox(width: 3),
-                          Text(
-                            '${NumberFormatter.compact(topic.citedByCount)} citations',
-                            style: tt.labelSmall?.copyWith(
-                              fontSize: 10,
-                              color: cs.onSurface.withValues(alpha: 0.5),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _RankBadge extends StatelessWidget {
-  final int rank;
-  const _RankBadge({required this.rank});
-
-  @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    final tt = Theme.of(context).textTheme;
-    final top3 = rank <= 3;
-    return Container(
-      width: 24,
-      height: 24,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: top3
-            ? cs.primary.withValues(alpha: 0.12)
-            : cs.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Text(
-        '$rank',
-        style: tt.labelMedium?.copyWith(
-          fontWeight: FontWeight.bold,
-          color: top3 ? cs.primary : cs.onSurfaceVariant,
-        ),
-      ),
-    );
-  }
-}
-
-/// ── Chart 2: Bubble (works × citations, cỡ = TB trích dẫn) ─────────────
-class _BubbleChart extends StatelessWidget {
-  final List<Topic> topics;
-  final ValueChanged<Topic> onSelect;
-  final int maxPoints;
-
-  const _BubbleChart({
-    required this.topics,
-    required this.onSelect,
-    required this.maxPoints,
-  });
-
-  double _log(num v) => math.log(v < 1 ? 1 : v) / math.ln10;
-
-  @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    final tt = Theme.of(context).textTheme;
-    final pts = topics.take(maxPoints).toList();
-    if (pts.isEmpty) return const SizedBox.shrink();
-
-    final maxAvg = pts.map((t) => t.avgCitations).fold<double>(1, math.max);
-
-    final spots = <ScatterSpot>[];
-    for (final t in pts) {
-      final radius = (6 + (t.avgCitations / maxAvg) * 16).clamp(6.0, 22.0);
-      spots.add(
-        ScatterSpot(
-          _log(t.worksCount),
-          _log(t.citedByCount),
-          dotPainter: FlDotCirclePainter(
-            radius: radius,
-            color: DomainPalette.of(t.domainName).withValues(alpha: 0.6),
-            strokeColor: cs.surface,
-            strokeWidth: 1.2,
-          ),
-        ),
-      );
-    }
-
-    Widget axisLabel(double value) => Text(
-          NumberFormatter.compact(math.pow(10, value).round()),
-          style: TextStyle(
-              fontSize: 9, color: cs.onSurface.withValues(alpha: 0.5)),
-        );
-
-    return Semantics(
-      label: 'Correlation chart of papers and citations for '
-          '${pts.length} topics. Bubble size shows average citations '
-          'per paper. Tap a bubble to select a topic.',
-      child: Column(
-        children: [
-          Expanded(
-            child: ScatterChart(
-              ScatterChartData(
-                scatterSpots: spots,
-                minX: 0,
-                minY: 0,
-                scatterTouchData: ScatterTouchData(
-                  enabled: true,
-                  handleBuiltInTouches: true,
-                  touchTooltipData: ScatterTouchTooltipData(
-                    getTooltipColor: (_) => cs.inverseSurface,
-                    getTooltipItems: (spot) {
-                      final idx = spots.indexWhere(
-                          (s) => s.x == spot.x && s.y == spot.y);
-                      if (idx < 0) return null;
-                      final t = pts[idx];
-                      return ScatterTooltipItem(
-                        t.displayName,
-                        textStyle: TextStyle(
-                          color: cs.onInverseSurface,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 11,
-                        ),
-                        children: [
-                          TextSpan(
-                            text:
-                                '\n${NumberFormatter.compact(t.worksCount)} papers · '
-                                '${NumberFormatter.compact(t.citedByCount)} citations',
-                            style: TextStyle(
-                              color: cs.onInverseSurface
-                                  .withValues(alpha: 0.85),
-                              fontWeight: FontWeight.normal,
-                              fontSize: 10,
-                            ),
-                          ),
-                        ],
-                      );
-                    },
-                  ),
-                  touchCallback: (event, response) {
-                    if (event is! FlTapUpEvent) return;
-                    final idx = response?.touchedSpot?.spotIndex;
-                    if (idx != null && idx >= 0 && idx < pts.length) {
-                      onSelect(pts[idx]);
-                    }
-                  },
-                ),
-                titlesData: FlTitlesData(
-                  leftTitles: AxisTitles(
-                    axisNameWidget: Text('Citations',
-                        style: TextStyle(
-                            fontSize: 9,
-                            color: cs.onSurface.withValues(alpha: 0.5))),
-                    axisNameSize: 14,
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      reservedSize: 30,
-                      interval: 1,
-                      getTitlesWidget: (v, _) => axisLabel(v),
-                    ),
-                  ),
-                  bottomTitles: AxisTitles(
-                    axisNameWidget: Text('Papers',
-                        style: TextStyle(
-                            fontSize: 9,
-                            color: cs.onSurface.withValues(alpha: 0.5))),
-                    axisNameSize: 14,
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      reservedSize: 18,
-                      interval: 1,
-                      getTitlesWidget: (v, _) => axisLabel(v),
-                    ),
-                  ),
-                  topTitles: const AxisTitles(
-                      sideTitles: SideTitles(showTitles: false)),
-                  rightTitles: const AxisTitles(
-                      sideTitles: SideTitles(showTitles: false)),
-                ),
-                gridData: FlGridData(
-                  show: true,
-                  drawHorizontalLine: true,
-                  drawVerticalLine: true,
-                  getDrawingHorizontalLine: (_) =>
-                      FlLine(color: cs.outlineVariant, strokeWidth: 0.5),
-                  getDrawingVerticalLine: (_) =>
-                      FlLine(color: cs.outlineVariant, strokeWidth: 0.5),
-                ),
-                borderData: FlBorderData(show: false),
-              ),
-            ),
-          ),
-          const SizedBox(height: 6),
-          // Chú giải: ý nghĩa kích thước bong bóng.
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.circle, size: 8, color: cs.primary),
-              const SizedBox(width: 4),
-              Icon(Icons.circle, size: 14, color: cs.primary),
-              const SizedBox(width: 6),
-              Flexible(
-                child: Text(
-                  'Larger bubble = more citations per paper · log scale',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: tt.labelSmall?.copyWith(
-                      color: cs.onSurface.withValues(alpha: 0.5)),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/// ── Chart 3: Tỷ trọng lĩnh vực (thanh tỉ lệ + chú giải, không phải treemap) ──
-class _DomainShareChart extends StatelessWidget {
+/// ── Research Landscape — Treemap 2 cấp (domain → topic) ──
+///
+/// Cấp 1: mỗi ô là một lĩnh vực (domain), to nhỏ theo tổng số bài. Tap để
+/// "lặn" vào xem các topic bên trong (cấp 2). Cách này gọn & dễ đọc trên
+/// mobile hơn là nhồi toàn bộ topic vào một treemap phẳng.
+class _DomainShareChart extends StatefulWidget {
   final List<Topic> topics;
   final ValueChanged<Topic> onSelect;
 
   const _DomainShareChart({required this.topics, required this.onSelect});
 
+  @override
+  State<_DomainShareChart> createState() => _DomainShareChartState();
+}
+
+class _DomainShareChartState extends State<_DomainShareChart> {
+  String? _openDomain;
+
   int _sum(List<Topic> ts) => ts.fold(0, (s, t) => s + t.worksCount);
+
+  @override
+  Widget build(BuildContext context) {
+    final groups = <String, List<Topic>>{};
+    for (final t in widget.topics) {
+      groups.putIfAbsent(t.domainName ?? 'Other', () => []).add(t);
+    }
+    for (final list in groups.values) {
+      list.sort((a, b) => b.worksCount.compareTo(a.worksCount));
+    }
+    if (groups.isEmpty) return const SizedBox.shrink();
+
+    // Domain đang mở có thể không còn sau khi đổi filter/search → quay về cấp 1.
+    final open =
+        _openDomain != null && groups.containsKey(_openDomain) ? _openDomain : null;
+
+    return open == null
+        ? _buildDomainLevel(groups)
+        : _buildTopicLevel(open, groups[open]!);
+  }
+
+  /// Cấp 1: treemap các domain.
+  Widget _buildDomainLevel(Map<String, List<Topic>> groups) {
+    final entries = groups.entries.toList()
+      ..sort((a, b) => _sum(b.value).compareTo(_sum(a.value)));
+
+    return _Treemap(
+      values: entries.map((e) => _sum(e.value).toDouble()).toList(),
+      tileBuilder: (i) {
+        final e = entries[i];
+        return _TreemapTile(
+          title: e.key,
+          subtitle: '${e.value.length} topics',
+          color: DomainPalette.of(e.key == 'Other' ? null : e.key),
+          drillable: true,
+          onTap: () => setState(() => _openDomain = e.key),
+        );
+      },
+      count: entries.length,
+    );
+  }
+
+  /// Cấp 2: breadcrumb quay lại + treemap các topic trong domain.
+  Widget _buildTopicLevel(String domain, List<Topic> topics) {
+    final cs = Theme.of(context).colorScheme;
+    final shown = topics.where((t) => t.worksCount > 0).take(14).toList();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        InkWell(
+          onTap: () => setState(() => _openDomain = null),
+          borderRadius: BorderRadius.circular(8),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.arrow_back, size: 16, color: cs.primary),
+                const SizedBox(width: 4),
+                Flexible(
+                  child: Text(
+                    domain,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                          color: cs.primary,
+                          fontWeight: FontWeight.w700,
+                        ),
+                  ),
+                ),
+                Text(
+                  '  ·  ${topics.length} topics',
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        color: cs.onSurface.withValues(alpha: 0.5),
+                      ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 4),
+        Expanded(
+          child: _Treemap(
+            values: shown.map((t) => t.worksCount.toDouble()).toList(),
+            count: shown.length,
+            tileBuilder: (i) => _TreemapTile(
+              title: shown[i].displayName,
+              subtitle: '${NumberFormatter.compact(shown[i].worksCount)} papers',
+              color: DomainPalette.of(shown[i].domainName),
+              onTap: () => widget.onSelect(shown[i]),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Khung treemap: nhận danh sách [values] (diện tích) + builder cho từng ô.
+class _Treemap extends StatelessWidget {
+  final List<double> values;
+  final int count;
+  final Widget Function(int index) tileBuilder;
+
+  const _Treemap({
+    required this.values,
+    required this.count,
+    required this.tileBuilder,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (count == 0) return const SizedBox.shrink();
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(12),
+      child: LayoutBuilder(
+        builder: (context, c) {
+          final rects =
+              _squarify(values, Rect.fromLTWH(0, 0, c.maxWidth, c.maxHeight));
+          return SizedBox(
+            width: c.maxWidth,
+            height: c.maxHeight,
+            child: Stack(
+              children: [
+                for (var i = 0; i < rects.length; i++)
+                  Positioned.fromRect(
+                    rect: rects[i].deflate(1),
+                    child: tileBuilder(i),
+                  ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+/// Squarified treemap (Bruls et al.): chia [container] thành các ô có diện
+/// tích tỉ lệ [values], ưu tiên ô gần vuông để dễ đọc. [values] đã sắp giảm dần.
+List<Rect> _squarify(List<double> values, Rect container) {
+  final total = values.fold<double>(0, (a, b) => a + b);
+  if (total <= 0 || container.width <= 0 || container.height <= 0) return [];
+
+  final scale = (container.width * container.height) / total;
+  final areas = values.map((v) => v * scale).toList();
+
+  final rects = <Rect>[];
+  var x = container.left;
+  var y = container.top;
+  var w = container.width;
+  var h = container.height;
+
+  var start = 0;
+  while (start < areas.length) {
+    final shortSide = math.min(w, h);
+    var end = start;
+    var rowSum = areas[start];
+    var worst = _worstRatio(areas, start, end, rowSum, shortSide);
+    while (end + 1 < areas.length) {
+      final newSum = rowSum + areas[end + 1];
+      final newWorst = _worstRatio(areas, start, end + 1, newSum, shortSide);
+      if (newWorst > worst) break;
+      worst = newWorst;
+      rowSum = newSum;
+      end++;
+    }
+
+    if (w >= h) {
+      final stripW = rowSum / h;
+      var yy = y;
+      for (var i = start; i <= end; i++) {
+        final cellH = areas[i] / stripW;
+        rects.add(Rect.fromLTWH(x, yy, stripW, cellH));
+        yy += cellH;
+      }
+      x += stripW;
+      w -= stripW;
+    } else {
+      final stripH = rowSum / w;
+      var xx = x;
+      for (var i = start; i <= end; i++) {
+        final cellW = areas[i] / stripH;
+        rects.add(Rect.fromLTWH(xx, y, cellW, stripH));
+        xx += cellW;
+      }
+      y += stripH;
+      h -= stripH;
+    }
+    start = end + 1;
+  }
+  return rects;
+}
+
+double _worstRatio(
+    List<double> areas, int start, int end, double sum, double shortSide) {
+  var maxA = areas[start];
+  var minA = areas[start];
+  for (var i = start + 1; i <= end; i++) {
+    if (areas[i] > maxA) maxA = areas[i];
+    if (areas[i] < minA) minA = areas[i];
+  }
+  final s2 = sum * sum;
+  final side2 = shortSide * shortSide;
+  if (s2 == 0 || minA == 0) return double.infinity;
+  return math.max((side2 * maxA) / s2, s2 / (side2 * minA));
+}
+
+/// Một ô treemap dùng chung cho cả domain & topic.
+class _TreemapTile extends StatelessWidget {
+  final String title;
+  final String subtitle;
+  final Color color;
+  final VoidCallback onTap;
+
+  /// Domain (cấp 1) thì hiện icon gợi ý "tap để xem topic bên trong".
+  final bool drillable;
+
+  const _TreemapTile({
+    required this.title,
+    required this.subtitle,
+    required this.color,
+    required this.onTap,
+    this.drillable = false,
+  });
 
   Color _readableOn(Color bg) =>
       ThemeData.estimateBrightnessForColor(bg) == Brightness.dark
@@ -586,128 +334,84 @@ class _DomainShareChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    final tt = Theme.of(context).textTheme;
+    final textColor = _readableOn(color);
+    return Semantics(
+      button: true,
+      label: title,
+      child: GestureDetector(
+        onTap: onTap,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(4),
+          ),
+          // Clip để chữ không bao giờ tràn ra ngoài ô (hết lỗi overflow).
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(4),
+            child: LayoutBuilder(
+              builder: (context, c) {
+                // Ô quá nhỏ thì chỉ hiện màu, không cố nhồi chữ (tránh cắt dọc).
+                final showLabel = c.maxWidth >= 48 && c.maxHeight >= 24;
+                if (!showLabel) return const SizedBox.expand();
 
-    final groups = <String, List<Topic>>{};
-    for (final t in topics) {
-      groups.putIfAbsent(t.domainName ?? 'Other', () => []).add(t);
-    }
-    final entries = groups.entries.toList()
-      ..sort((a, b) => _sum(b.value).compareTo(_sum(a.value)));
-    if (entries.isEmpty) return const SizedBox.shrink();
+                final showSub = c.maxHeight >= 44;
+                final maxLines = (c.maxHeight ~/ 14).clamp(1, 3);
 
-    final total = entries.fold<int>(0, (s, e) => s + _sum(e.value));
-
-    Color colorOf(String key) =>
-        DomainPalette.of(key == 'Other' ? null : key);
-
-    void selectTop(List<Topic> ts) {
-      final top = [...ts]
-        ..sort((a, b) => b.worksCount.compareTo(a.worksCount));
-      if (top.isNotEmpty) onSelect(top.first);
-    }
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        // Thanh tỉ lệ ngang: nhãn % chỉ hiện trên mảng đủ rộng (>12%).
-        ClipRRect(
-          borderRadius: BorderRadius.circular(8),
-          child: SizedBox(
-            height: 28,
-            child: Row(
-              children: [
-                for (final e in entries)
-                  Expanded(
-                    flex: _sum(e.value).clamp(1, 1 << 30),
-                    child: Builder(builder: (_) {
-                      final frac = _sum(e.value) / total;
-                      final bg = colorOf(e.key);
-                      return Semantics(
-                        button: true,
-                        label: '${e.key}: ${(frac * 100).round()}%',
-                        child: GestureDetector(
-                          onTap: () => selectTop(e.value),
-                          child: Container(
-                            color: bg,
-                            alignment: Alignment.center,
-                            child: frac > 0.12
-                                ? Text(
-                                    '${(frac * 100).round()}%',
-                                    style: TextStyle(
-                                      color: _readableOn(bg),
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  )
-                                : null,
+                return Stack(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 6, vertical: 5),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Flexible(
+                            child: Text(
+                              title,
+                              maxLines: maxLines,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                color: textColor,
+                                fontSize: 10,
+                                fontWeight: FontWeight.w700,
+                                height: 1.15,
+                              ),
+                            ),
                           ),
+                          if (showSub && subtitle.isNotEmpty) ...[
+                            const SizedBox(height: 2),
+                            Text(
+                              subtitle,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                color: textColor.withValues(alpha: 0.75),
+                                fontSize: 8.5,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                    if (drillable && c.maxWidth >= 60 && c.maxHeight >= 40)
+                      Positioned(
+                        top: 4,
+                        right: 4,
+                        child: Icon(
+                          Icons.zoom_in,
+                          size: 14,
+                          color: textColor.withValues(alpha: 0.7),
                         ),
-                      );
-                    }),
-                  ),
-              ],
+                      ),
+                  ],
+                );
+              },
             ),
           ),
         ),
-        const SizedBox(height: 12),
-        // Chú giải đầy đủ (cuộn được) — đảm bảo đọc tốt cả khi nhiều lĩnh vực.
-        Expanded(
-          child: ListView.separated(
-            padding: EdgeInsets.zero,
-            itemCount: entries.length,
-            separatorBuilder: (_, _) => const SizedBox(height: 2),
-            itemBuilder: (context, i) {
-              final e = entries[i];
-              final frac = _sum(e.value) / total;
-              return InkWell(
-                onTap: () => selectTop(e.value),
-                borderRadius: BorderRadius.circular(8),
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(minHeight: 40),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 4, vertical: 6),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 12,
-                          height: 12,
-                          decoration: BoxDecoration(
-                            color: colorOf(e.key),
-                            borderRadius: BorderRadius.circular(3),
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Text(
-                            e.key,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: tt.bodyMedium
-                                ?.copyWith(fontWeight: FontWeight.w500),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          '${e.value.length} topics · ${(frac * 100).round()}%',
-                          style: tt.labelSmall?.copyWith(
-                              color: cs.onSurface.withValues(alpha: 0.6)),
-                        ),
-                        const SizedBox(width: 4),
-                        Icon(Icons.chevron_right,
-                            size: 16,
-                            color: cs.onSurface.withValues(alpha: 0.3)),
-                      ],
-                    ),
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-      ],
+      ),
     );
   }
 }

@@ -67,6 +67,10 @@ class BuildResearchDashboard {
         return (b.publicationYear ?? 0).compareTo(a.publicationYear ?? 0);
       });
 
+    // Bài báo có năm xuất bản → dữ liệu cho scatter Năm × Citations.
+    final scatterPapers =
+        works.where((w) => w.publicationYear != null).toList(growable: false);
+
     return ResearchDashboardSummary(
       topic: topic,
       totalPublications: worksPage.total,
@@ -78,6 +82,7 @@ class BuildResearchDashboard {
       topJournals: _rank(journalCounts, limit: 5),
       topAuthors: _rank(authorCounts, limit: 5),
       topPapers: topPapers.take(5).toList(growable: false),
+      scatterPapers: scatterPapers,
     );
   }
 
