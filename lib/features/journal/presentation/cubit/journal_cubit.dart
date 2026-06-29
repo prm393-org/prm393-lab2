@@ -14,7 +14,7 @@ class JournalCubit extends Cubit<JournalState> {
   JournalCubit(this._getWorksByTopic, this._getTopicTrend)
       : super(const JournalInitial());
 
-  static const _perPage = 10;
+  static const _perPage = 25;
 
   Topic? _topic;
   int _page = 1;

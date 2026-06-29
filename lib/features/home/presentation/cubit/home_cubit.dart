@@ -13,7 +13,7 @@ class HomeCubit extends Cubit<HomeState> {
 
   HomeCubit(this._searchTopics) : super(const HomeInitial());
 
-  static const _perPage = 10;
+  static const _perPage = 25;
 
   TopicSortFilter _filter = TopicSortFilter.popular;
   String? _query;
