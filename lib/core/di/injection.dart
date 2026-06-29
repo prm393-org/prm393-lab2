@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../config/app_config.dart';
 import '../constants/app_constants.dart';
+import '../data/recent_searches_store.dart';
 import '../network/api_client.dart';
 import '../network/network_info.dart';
 import '../../features/profile/di/profile_di.dart';
@@ -22,6 +23,9 @@ Future<void> configureDependencies() async {
   getIt.registerSingleton<SharedPreferences>(prefs);
   getIt.registerLazySingleton<Connectivity>(() => Connectivity());
   getIt.registerLazySingleton<Dio>(() => Dio());
+  getIt.registerLazySingleton<RecentSearchesStore>(
+    () => RecentSearchesStore(getIt<SharedPreferences>()),
+  );
 
   // Core
   getIt.registerLazySingleton<NetworkInfo>(

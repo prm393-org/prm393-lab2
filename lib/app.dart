@@ -9,6 +9,7 @@ import 'core/theme/app_theme.dart';
 import 'features/profile/di/profile_di.dart';
 import 'features/profile/presentation/cubit/profile_cubit.dart';
 import 'features/profile/presentation/cubit/profile_state.dart';
+import 'features/shared/presentation/cubit/pending_search_cubit.dart';
 import 'features/shared/presentation/cubit/selected_topic_cubit.dart';
 
 class App extends StatelessWidget {
@@ -20,6 +21,9 @@ class App extends StatelessWidget {
       providers: [
         BlocProvider<SelectedTopicCubit>(
           create: (_) => getIt<SelectedTopicCubit>(),
+        ),
+        BlocProvider<PendingSearchCubit>(
+          create: (_) => getIt<PendingSearchCubit>(),
         ),
         BlocProvider<ProfileCubit>(
           create: (_) {

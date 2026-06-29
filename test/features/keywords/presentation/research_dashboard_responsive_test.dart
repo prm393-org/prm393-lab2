@@ -117,7 +117,35 @@ const _summary = ResearchDashboardSummary(
   mostActiveYear: 2024,
   sampleSize: 100,
   yearlyTrend: _trend,
+  citationTrend: _trend,
   topJournals: _rankings,
   topAuthors: _rankings,
+  topKeywords: _rankings,
+  topInstitutions: _rankings,
+  authorStats: _impactStats,
+  institutionStats: _impactStats,
+  journalStats: _impactStats,
+  emergingKeywords: _emergingKeywords,
+  frontierKeywords: _frontierKeywords,
   topPapers: _papers,
+  scatterPapers: _papers,
 );
+
+const _impactStats = [
+  ImpactStat(name: 'Author A', papers: 5, citations: 1200),
+  ImpactStat(name: 'Author B', papers: 4, citations: 980),
+  ImpactStat(name: 'Author C', papers: 3, citations: 540),
+  ImpactStat(name: 'Author D', papers: 2, citations: 210),
+];
+
+const _emergingKeywords = [
+  KeywordSeries(keyword: 'kw a', points: _trend),
+  KeywordSeries(keyword: 'kw b', points: _trend),
+];
+
+const _frontierKeywords = [
+  KeywordFrontierPoint(keyword: 'kw a', meanYear: 2022, papers: 5, citations: 800),
+  KeywordFrontierPoint(keyword: 'kw b', meanYear: 2021, papers: 4, citations: 600),
+  KeywordFrontierPoint(keyword: 'kw c', meanYear: 2020, papers: 3, citations: 300),
+  KeywordFrontierPoint(keyword: 'kw d', meanYear: 2019, papers: 2, citations: 120),
+];

@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/constants/app_constants.dart';
+import '../../../../core/data/recent_searches_store.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../publication/domain/usecases/search_topics.dart';
+import '../../../shared/presentation/cubit/pending_search_cubit.dart';
 import '../../../shared/presentation/cubit/selected_topic_cubit.dart';
 import '../cubit/profile_cubit.dart';
 import '../cubit/profile_state.dart';
@@ -21,8 +24,8 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   late final TextEditingController _apiKeyCtrl;
   late final TextEditingController _mailtoCtrl;
+  final RecentSearchesStore _recentStore = GetIt.I<RecentSearchesStore>();
   bool _fieldsReady = false;
-  int _recentSearchCount = 0;
   int _savedTopicCount = 0;
 
   @override
@@ -50,10 +53,8 @@ class _ProfilePageState extends State<ProfilePage> {
 
   void _loadLibraryCounts() {
     final prefs = GetIt.I<SharedPreferences>();
-    final recent = prefs.getStringList(AppConstants.prefRecentSearches) ?? [];
     final saved = prefs.getStringList(AppConstants.prefSavedTopics) ?? [];
     setState(() {
-      _recentSearchCount = recent.length;
       _savedTopicCount = saved.length;
     });
   }
@@ -158,9 +159,16 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
+  /// Yêu cầu Home điền sẵn & tìm từ khoá, rồi chuyển sang tab Home.
+  void _searchFromHistory(String query) {
+    context.read<PendingSearchCubit>().request(query);
+    context.go('/home');
+  }
+
   Future<void> _showLibrarySheet({
     required String title,
     required List<String> items,
+    ValueChanged<String>? onItemTap,
   }) async {
     await showModalBottomSheet<void>(
       context: context,
@@ -198,7 +206,19 @@ class _ProfilePageState extends State<ProfilePage> {
                   itemCount: items.length,
                   itemBuilder: (_, i) => ListTile(
                     dense: true,
+                    leading: onItemTap != null
+                        ? const Icon(Icons.history, size: 18)
+                        : null,
                     title: Text(items[i]),
+                    trailing: onItemTap != null
+                        ? const Icon(Icons.north_west, size: 16)
+                        : null,
+                    onTap: onItemTap == null
+                        ? null
+                        : () {
+                            Navigator.pop(ctx);
+                            onItemTap(items[i]);
+                          },
                   ),
                 ),
               ),
@@ -232,7 +252,7 @@ class _ProfilePageState extends State<ProfilePage> {
     if (ok != true || !mounted) return;
 
     final prefs = GetIt.I<SharedPreferences>();
-    await prefs.remove(AppConstants.prefRecentSearches);
+    _recentStore.clear();
     await prefs.remove(AppConstants.prefSavedTopics);
     await prefs.remove(AppConstants.prefLastSync);
     context.read<SelectedTopicCubit>().clear();
@@ -267,8 +287,6 @@ class _ProfilePageState extends State<ProfilePage> {
         final settings = state.settings;
         final isSaving = state.status == ProfileStatus.saving;
         final prefs = GetIt.I<SharedPreferences>();
-        final recentItems =
-            prefs.getStringList(AppConstants.prefRecentSearches) ?? [];
         final savedItems =
             prefs.getStringList(AppConstants.prefSavedTopics) ?? [];
 
@@ -328,13 +346,17 @@ class _ProfilePageState extends State<ProfilePage> {
                     _SectionHeader(label: 'LIBRARY'),
                     _SettingsCard(
                       children: [
-                        _SettingsRow(
-                          icon: Icons.history_outlined,
-                          title: 'Recent searches',
-                          badge: '$_recentSearchCount',
-                          onTap: () => _showLibrarySheet(
+                        ListenableBuilder(
+                          listenable: _recentStore,
+                          builder: (context, _) => _SettingsRow(
+                            icon: Icons.history_outlined,
                             title: 'Recent searches',
-                            items: recentItems,
+                            badge: '${_recentStore.count}',
+                            onTap: () => _showLibrarySheet(
+                              title: 'Recent searches',
+                              items: _recentStore.items,
+                              onItemTap: _searchFromHistory,
+                            ),
                           ),
                         ),
                         _SettingsRow(
