@@ -12,10 +12,16 @@ class TrendChart extends StatelessWidget {
   final List<TrendPoint> trend;
   final int maxYears;
 
+  /// Tiêu đề + đơn vị (để tái dùng cho Publication trend / Citation trend...).
+  final String title;
+  final String unit;
+
   const TrendChart({
     super.key,
     required this.trend,
     this.maxYears = 12,
+    this.title = 'Publication trend',
+    this.unit = 'papers',
   });
 
   @override
@@ -59,7 +65,7 @@ class TrendChart extends StatelessWidget {
                 const SizedBox(width: 6),
                 Expanded(
                   child: Text(
-                    'Publication trend',
+                    title,
                     style: tt.titleSmall?.copyWith(fontWeight: FontWeight.w600),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -97,7 +103,7 @@ class TrendChart extends StatelessWidget {
             ),
             const SizedBox(height: 2),
             Text(
-              'Total ${NumberFormatter.compact(total)} papers '
+              'Total ${NumberFormatter.compact(total)} $unit '
               '· ${points.first.year}–${points.last.year}',
               style: tt.bodySmall
                   ?.copyWith(color: cs.onSurface.withValues(alpha: 0.5)),
@@ -127,7 +133,7 @@ class TrendChart extends StatelessWidget {
                           ),
                           children: [
                             TextSpan(
-                              text: '${NumberFormatter.compact(p.count)} papers',
+                              text: '${NumberFormatter.compact(p.count)} $unit',
                               style: TextStyle(
                                 color: cs.onInverseSurface.withValues(alpha: 0.8),
                                 fontSize: 11,

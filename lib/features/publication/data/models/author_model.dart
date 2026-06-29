@@ -6,6 +6,7 @@ class AuthorModel extends Author {
     required super.displayName,
     super.orcid,
     super.affiliations = const [],
+    super.institutions = const [],
   });
 
   factory AuthorModel.fromJson(Map<String, dynamic> json) {
@@ -15,7 +16,21 @@ class AuthorModel extends Author {
       displayName: (author['display_name'] as String?) ?? 'Unknown Author',
       orcid: author['orcid'] as String?,
       affiliations: _parseAffiliations(json),
+      institutions: _parseInstitutions(json),
     );
+  }
+
+  /// Tên tổ chức sạch từ authorship.institutions[].display_name.
+  static List<String> _parseInstitutions(Map<String, dynamic> authorship) {
+    final institutions = authorship['institutions'] as List<dynamic>? ?? [];
+    return institutions
+        .whereType<Map<String, dynamic>>()
+        .map((i) => i['display_name'] as String?)
+        .whereType<String>()
+        .map((s) => s.trim())
+        .where((s) => s.isNotEmpty)
+        .toSet()
+        .toList(growable: false);
   }
 
   static List<String> _parseAffiliations(Map<String, dynamic> authorship) {

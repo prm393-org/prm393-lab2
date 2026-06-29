@@ -5,53 +5,42 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/utils/number_formatter.dart';
-import '../../../publication/domain/entities/work.dart';
+import '../../domain/entities/research_dashboard_summary.dart';
 import 'chart_axis_utils.dart';
 
-/// Scatter "Papers × Citations": mỗi bong bóng là một bài báo, đặt theo
-/// năm xuất bản (trục X) và số trích dẫn (trục Y, thang log). Bong bóng
-/// càng to = càng nhiều citation. Tap để mở chi tiết bài báo.
-class ResearchDashboardScatter extends StatelessWidget {
-  final List<Work> papers;
-  final ValueChanged<Work> onPaperTap;
+/// #27 Research Frontier Detection — bong bóng keyword: trục X = năm trung bình
+/// (càng phải = càng mới), trục Y = số bài (khối lượng), cỡ = tổng trích dẫn.
+/// Keyword ở góc phải-trên = chủ đề mới nổi & đang sôi động.
+class ResearchDashboardFrontier extends StatelessWidget {
+  final List<KeywordFrontierPoint> keywords;
 
-  const ResearchDashboardScatter({
-    super.key,
-    required this.papers,
-    required this.onPaperTap,
-  });
-
-  double _log(num v) => math.log(v < 1 ? 1 : v) / math.ln10;
+  const ResearchDashboardFrontier({super.key, required this.keywords});
 
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final tt = Theme.of(context).textTheme;
 
-    final pts = papers.where((w) => w.publicationYear != null).toList();
+    final pts = keywords.where((k) => k.papers > 0).toList();
     if (pts.length < 4) return const SizedBox.shrink();
 
-    final years = pts.map((w) => w.publicationYear!).toList();
-    final minYear = years.reduce(math.min);
-    final maxYear = years.reduce(math.max);
-    final maxCited =
-        pts.map((w) => w.citedByCount).fold<int>(1, math.max).toDouble();
-    // Trục Y log: trần là một "thập kỷ" tròn để nhãn 1/10/100/1K/10K gọn.
-    final maxLogY =
-        (math.log(maxCited) / math.ln10).ceilToDouble().clamp(1.0, 9.0);
-    final yearStep = yearAxisStep(maxYear - minYear);
+    final minYear = pts.map((k) => k.meanYear).reduce(math.min);
+    final maxYear = pts.map((k) => k.meanYear).reduce(math.max);
+    final minYearInt = minYear.floor();
+    final yearStep = yearAxisStep((maxYear - minYear).ceil());
+    final maxPapers = pts.map((k) => k.papers).fold<int>(1, math.max);
+    final maxCited = pts.map((k) => k.citations).fold<int>(1, math.max);
 
     final spots = <ScatterSpot>[];
-    for (final w in pts) {
-      final radius =
-          (5 + (w.citedByCount / maxCited) * 15).clamp(5.0, 20.0);
+    for (final k in pts) {
+      final radius = (5 + (k.citations / maxCited) * 16).clamp(5.0, 22.0);
       spots.add(
         ScatterSpot(
-          w.publicationYear!.toDouble(),
-          _log(w.citedByCount),
+          k.meanYear,
+          k.papers.toDouble(),
           dotPainter: FlDotCirclePainter(
             radius: radius,
-            color: AppColors.tertiary.withValues(alpha: 0.55),
+            color: AppColors.secondary.withValues(alpha: 0.55),
             strokeColor: cs.surface,
             strokeWidth: 1.2,
           ),
@@ -73,11 +62,11 @@ class ResearchDashboardScatter extends StatelessWidget {
           children: [
             Row(
               children: [
-                Icon(Icons.bubble_chart_outlined, size: 18, color: cs.primary),
+                Icon(Icons.explore_outlined, size: 18, color: cs.primary),
                 const SizedBox(width: 6),
                 Expanded(
                   child: Text(
-                    'Papers × Citations',
+                    'Research frontier',
                     style: tt.titleSmall?.copyWith(fontWeight: FontWeight.w600),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -87,7 +76,7 @@ class ResearchDashboardScatter extends StatelessWidget {
             ),
             const SizedBox(height: 2),
             Text(
-              'Each bubble is a paper · ${pts.length} of sample',
+              'Keyword recency × volume · ${pts.length} keywords',
               style: tt.bodySmall
                   ?.copyWith(color: cs.onSurface.withValues(alpha: 0.5)),
               maxLines: 1,
@@ -102,7 +91,7 @@ class ResearchDashboardScatter extends StatelessWidget {
                   minX: minYear - 0.6,
                   maxX: maxYear + 0.6,
                   minY: 0,
-                  maxY: maxLogY,
+                  maxY: maxPapers * 1.2,
                   scatterTouchData: ScatterTouchData(
                     enabled: true,
                     handleBuiltInTouches: true,
@@ -112,9 +101,9 @@ class ResearchDashboardScatter extends StatelessWidget {
                         final idx = spots.indexWhere(
                             (s) => s.x == spot.x && s.y == spot.y);
                         if (idx < 0) return null;
-                        final w = pts[idx];
+                        final k = pts[idx];
                         return ScatterTooltipItem(
-                          w.title,
+                          k.keyword,
                           textStyle: TextStyle(
                             color: cs.onInverseSurface,
                             fontWeight: FontWeight.bold,
@@ -122,8 +111,9 @@ class ResearchDashboardScatter extends StatelessWidget {
                           ),
                           children: [
                             TextSpan(
-                              text: '\n${w.publicationYear} · '
-                                  '${NumberFormatter.compact(w.citedByCount)} citations',
+                              text: '\n~${k.meanYear.round()} · '
+                                  '${k.papers} papers · '
+                                  '${NumberFormatter.compact(k.citations)} cit.',
                               style: TextStyle(
                                 color:
                                     cs.onInverseSurface.withValues(alpha: 0.85),
@@ -135,32 +125,23 @@ class ResearchDashboardScatter extends StatelessWidget {
                         );
                       },
                     ),
-                    touchCallback: (event, response) {
-                      if (event is! FlTapUpEvent) return;
-                      final idx = response?.touchedSpot?.spotIndex;
-                      if (idx != null && idx >= 0 && idx < pts.length) {
-                        onPaperTap(pts[idx]);
-                      }
-                    },
                   ),
                   titlesData: FlTitlesData(
                     leftTitles: AxisTitles(
-                      axisNameWidget: Text('Citations',
+                      axisNameWidget: Text('Papers',
                           style: TextStyle(
                               fontSize: 9,
                               color: cs.onSurface.withValues(alpha: 0.5))),
                       axisNameSize: 14,
                       sideTitles: SideTitles(
                         showTitles: true,
-                        reservedSize: 34,
-                        interval: 1,
+                        reservedSize: 26,
                         getTitlesWidget: (v, _) {
-                          // Chỉ nhãn ở giá trị log nguyên (1/10/100/1K/10K).
-                          if ((v - v.round()).abs() > 0.01) {
+                          if (v != v.roundToDouble()) {
                             return const SizedBox.shrink();
                           }
                           return Text(
-                            NumberFormatter.compact(math.pow(10, v).round()),
+                            v.toInt().toString(),
                             style: TextStyle(
                                 fontSize: 9,
                                 color: cs.onSurface.withValues(alpha: 0.5)),
@@ -169,18 +150,18 @@ class ResearchDashboardScatter extends StatelessWidget {
                       ),
                     ),
                     bottomTitles: AxisTitles(
-                      axisNameWidget: Text('Publication year',
+                      axisNameWidget: Text('Mean publication year (newer →)',
                           style: TextStyle(
                               fontSize: 9,
                               color: cs.onSurface.withValues(alpha: 0.5))),
                       axisNameSize: 16,
                       sideTitles: SideTitles(
                         showTitles: true,
-                        reservedSize: 22,
+                        reservedSize: 20,
                         interval: yearStep.toDouble(),
                         getTitlesWidget: (v, _) => yearAxisLabel(
                           v,
-                          minYear,
+                          minYearInt,
                           yearStep,
                           cs.onSurface.withValues(alpha: 0.5),
                         ),
@@ -193,9 +174,9 @@ class ResearchDashboardScatter extends StatelessWidget {
                   ),
                   gridData: FlGridData(
                     show: true,
-                    drawHorizontalLine: true,
-                    drawVerticalLine: false,
                     getDrawingHorizontalLine: (_) =>
+                        FlLine(color: cs.outlineVariant, strokeWidth: 0.5),
+                    getDrawingVerticalLine: (_) =>
                         FlLine(color: cs.outlineVariant, strokeWidth: 0.5),
                   ),
                   borderData: FlBorderData(show: false),
@@ -206,13 +187,13 @@ class ResearchDashboardScatter extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.circle, size: 8, color: AppColors.tertiary),
+                Icon(Icons.circle, size: 8, color: AppColors.secondary),
                 const SizedBox(width: 4),
-                Icon(Icons.circle, size: 14, color: AppColors.tertiary),
+                Icon(Icons.circle, size: 14, color: AppColors.secondary),
                 const SizedBox(width: 6),
                 Flexible(
                   child: Text(
-                    'Larger bubble = more cited · tap to open · log scale',
+                    'Bigger = more cited · right = newer topics',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: tt.labelSmall
